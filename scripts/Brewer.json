@@ -1,0 +1,213 @@
+[
+  {
+    "@id": "dtmi:CoffeeCo:Brewer;1",
+    "@type": "Interface",
+    "contents": [
+      {
+        "@id": "dtmi:CoffeeCo:Brewer:Temperature;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "Temperature"
+        },
+        "name": "Temperature",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:CoffeeCo:Brewer:StartBrew;1",
+        "@type": "Command",
+        "commandType": "synchronous",
+        "displayName": {
+          "en": "StartBrew"
+        },
+        "name": "StartBrew"
+      },
+      {
+        "@id": "dtmi:CoffeeCo:Brewer:Wakeup;1",
+        "@type": "Command",
+        "displayName": {
+          "en": "Wakeup"
+        },
+        "name": "Wakeup"
+      },
+      {
+        "@id": "dtmi:CoffeeCo:Brewer:SerialNumber;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "SerialNumber"
+        },
+        "name": "SerialNumber",
+        "schema": "string",
+        "writable": false
+      },
+      {
+        "@id": "dtmi:CoffeeCo:Brewer:Model;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Model"
+        },
+        "name": "Model",
+        "schema": "string",
+        "writable": false
+      },
+      {
+        "@id": "dtmi:CoffeeCo:Brewer:WakeupTime;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "WakeupTime"
+        },
+        "name": "WakeupTime",
+        "schema": "time",
+        "writable": true
+      }
+    ],
+    "displayName": {
+      "en": "Brewer"
+    },
+    "extends": [
+      "dtmi:CoffeeCo:BrewerBoiler;1",
+      "dtmi:CoffeeCo:BrewerDisplay;1"
+    ],
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ]
+  },
+  {
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ],
+    "@id": "dtmi:CoffeeCo:BrewerBoiler;1",
+    "@type": "Interface",
+    "contents": [
+      {
+        "@id": "dtmi:CoffeeCo:BrewerBoiler:Pressure;1",
+        "@type": [
+          "Telemetry",
+          "Pressure"
+        ],
+        "displayName": {
+          "en": "Pressure"
+        },
+        "name": "Pressure",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:CoffeeCo:BrewerBoiler:BoilerTemperature;1",
+        "@type": [
+          "Telemetry",
+          "Temperature"
+        ],
+        "displayName": {
+          "en": "BoilerTemperature"
+        },
+        "name": "BoilerTemperature",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:CoffeeCo:BrewerBoiler:SteamFlowRate;1",
+        "@type": [
+          "Telemetry",
+          "Velocity"
+        ],
+        "displayName": {
+          "en": "SteamFlowRate"
+        },
+        "name": "SteamFlowRate",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:CoffeeCo:BrewerBoiler:Clean;1",
+        "@type": "Command",
+        "displayName": {
+          "en": "Clean"
+        },
+        "name": "Clean"
+      },
+      {
+        "@id": "dtmi:CoffeeCo:BrewerBoiler:ManufacturedDate;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "ManufacturedDate"
+        },
+        "name": "ManufacturedDate",
+        "schema": "date",
+        "writable": false
+      },
+      {
+        "@id": "dtmi:CoffeeCo:BrewerBoiler:NextCleaningDate;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "NextCleaningDate"
+        },
+        "name": "NextCleaningDate",
+        "schema": "dateTime",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:CoffeeCo:BrewerBoiler:CleaningCycleFrequency;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "CleaningCycleFrequency"
+        },
+        "name": "CleaningCycleFrequency",
+        "schema": "integer",
+        "writable": true
+      }
+    ],
+    "displayName": {
+      "en": "Boiler"
+    }
+  },
+  {
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ],
+    "@id": "dtmi:CoffeeCo:BrewerDisplay;1",
+    "@type": "Interface",
+    "contents": [
+      {
+        "@id": "dtmi:CoffeeCo:BrewerDisplay:BrightnessLevel;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "BrightnessLevel"
+        },
+        "name": "BrightnessLevel",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:CoffeeCo:BrewerDisplay:Message;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Message"
+        },
+        "name": "Message",
+        "schema": "string",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:CoffeeCo:BrewerDisplay:ImageLocation;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "ImageLocation"
+        },
+        "name": "ImageLocation",
+        "schema": "string",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:CoffeeCo:BrewerDisplay:Restart;1",
+        "@type": "Command",
+        "commandType": "synchronous",
+        "displayName": {
+          "en": "Restart"
+        },
+        "name": "Restart"
+      }
+    ],
+    "displayName": {
+      "en": "Display"
+    }
+  }
+]

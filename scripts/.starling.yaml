@@ -1,0 +1,22 @@
+HTTP:
+    adminPort: 6001                     # Port number of the administrative service.
+    metricsPort: 6002                   # Port number for Prometheus service to scrape.
+Simulation:
+    connectionTimeout: 30000            # Connection timeout in milli seconds.
+    telemetryTimeout: 30000             # Telemetry send timeout in milli seconds.
+    twinUpdateTimeout: 30000            # Twin update timeout in milli seconds.
+    commandTimeout: 30000               # Command ack timeout in milli seconds.
+    registrationAttemptTimeout: 30000   # Device registration timeout in milli seconds.
+    maxConcurrentConnections: 100       # Maximum number of concurrent connections to send telemetry per simulation.
+    maxConcurrentTwinUpdates: 10        # Maximum number of concurrent twin updates per simulation.
+    maxConcurrentRegistrations: 10      # Maximum number of concurrent device registrations (DPS calls).
+    maxConcurrentDeletes: 10            # Maximum number of concurrent device deletes.
+    maxRegistrationAttempts: 10         # Maximum number of device registration attempts.
+    enableTelemetry: true               # Enable device telemetry sends across all simulations.
+    enableReportedProps: true           # Enable device reported property sends across all simulations.
+    enableTwinUpdateAcks: true          # Enable device twin (desired property) update acknowledgement across all simulations.
+    enableCommandAcks: true             # Enable device command (direct method, C2D) acknowledgement across all simulations.
+Data:
+    dataDirectory: "."                  # Directory used for storing Simulation data.
+Logger:
+    logLevel: debug				        # Logging legel for the logger. Available logging levels are - panic, fatal, error, warn, info, debug, trace.

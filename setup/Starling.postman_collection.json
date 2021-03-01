@@ -1,0 +1,882 @@
+{
+	"info": {
+		"_postman_id": "4db22c4a-ea1d-4cf7-b5df-81112fca902f",
+		"name": "Starling",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "simulations",
+			"item": [
+				{
+					"name": "simulation device config",
+					"item": [
+						{
+							"name": "List all device configs",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/simulation/:id/deviceConfig",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"simulation",
+										":id",
+										"deviceConfig"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "sim1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a device config",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/simulation/:id/deviceConfig/:configId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"simulation",
+										":id",
+										"deviceConfig",
+										":configId"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "sim1",
+											"type": "string"
+										},
+										{
+											"key": "configId",
+											"value": "car",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create or update a device config",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"truck\",\r\n    \"modelId\": \"truck\",\r\n    \"deviceCount\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/simulation/:id/deviceConfig",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"simulation",
+										":id",
+										"deviceConfig"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "sim1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a device config",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Id\": \"sim1\",\r\n    \"Name\": \"sim1\",\r\n    \"TargetId\": \"reddy-dev\",\r\n    \"Status\": \"Created\",\r\n    \"CreatedDate\": \"2021-01-28T16:44:39.9159324-08:00\",\r\n    \"StartDate\": \"2021-01-28T16:44:39.9159324-08:00\",\r\n    \"StopDate\": \"2021-01-28T16:44:39.9159324-08:00\",\r\n    \"DeviceConfig\": [\r\n        {\r\n            \"ModelName\": \"car\",\r\n            \"DeviceCount\": 1000,\r\n            \"TelemetryPerHourPerDevice\": 120,\r\n            \"TelemetryBatchSize\": 10,\r\n            \"ReportedPropertyUpdatesPerHourPerDevice\": 20,\r\n            \"TwinUpdatesPerHourPerDevice\": 20,\r\n            \"DirectMethodsPerHourPerDevice\": 10,\r\n            \"CloudToDeviceMessagesPerHourPerDevice\": 10\r\n        },\r\n        {\r\n            \"ModelName\": \"truck\",\r\n            \"DeviceCount\": 5000,\r\n            \"TelemetryPerHourPerDevice\": 60,\r\n            \"TelemetryBatchSize\": 5,\r\n            \"ReportedPropertyUpdatesPerHourPerDevice\": 15,\r\n            \"TwinUpdatesPerHourPerDevice\": 10,\r\n            \"DirectMethodsPerHourPerDevice\": 5,\r\n            \"CloudToDeviceMessagesPerHourPerDevice\": 5\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/simulation/:id/deviceConfig/:configId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"simulation",
+										":id",
+										"deviceConfig",
+										":configId"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "sim1",
+											"type": "string"
+										},
+										{
+											"key": "configId",
+											"value": "car",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Start a simulation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/simulation/:id/start",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simulation",
+								":id",
+								"start"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "sim1",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Stop a simulation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/simulation/:id/stop",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simulation",
+								":id",
+								"stop"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "sim1",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List all simulations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/simulation",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simulation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a simulation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/simulation/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simulation",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "sim1",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create or update a simulation",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"sim1\",\r\n    \"name\": \"sim1\",\r\n    \"targetId\": \"app1\",\r\n    \"status\": \"created\",\r\n    \"waveGroupCount\": 2,\r\n    \"waveGroupInterval\": 10,\r\n    \"telemetryBatchSize\": 5,\r\n    \"telemetryInterval\": 30,\r\n    \"reportedPropertyInterval\": 3600,\r\n    \"disconnectBehavior\": \"never\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/simulation",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simulation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a simulation",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Id\": \"sim1\",\r\n    \"Name\": \"sim1\",\r\n    \"TargetId\": \"reddy-dev\",\r\n    \"Status\": \"Created\",\r\n    \"CreatedDate\": \"2021-01-28T16:44:39.9159324-08:00\",\r\n    \"StartDate\": \"2021-01-28T16:44:39.9159324-08:00\",\r\n    \"StopDate\": \"2021-01-28T16:44:39.9159324-08:00\",\r\n    \"DeviceConfig\": [\r\n        {\r\n            \"ModelName\": \"car\",\r\n            \"DeviceCount\": 1000,\r\n            \"TelemetryPerHourPerDevice\": 120,\r\n            \"TelemetryBatchSize\": 10,\r\n            \"ReportedPropertyUpdatesPerHourPerDevice\": 20,\r\n            \"TwinUpdatesPerHourPerDevice\": 20,\r\n            \"DirectMethodsPerHourPerDevice\": 10,\r\n            \"CloudToDeviceMessagesPerHourPerDevice\": 10\r\n        },\r\n        {\r\n            \"ModelName\": \"truck\",\r\n            \"DeviceCount\": 5000,\r\n            \"TelemetryPerHourPerDevice\": 60,\r\n            \"TelemetryBatchSize\": 5,\r\n            \"ReportedPropertyUpdatesPerHourPerDevice\": 15,\r\n            \"TwinUpdatesPerHourPerDevice\": 10,\r\n            \"DirectMethodsPerHourPerDevice\": 5,\r\n            \"CloudToDeviceMessagesPerHourPerDevice\": 5\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/simulation/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simulation",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "models",
+			"item": [
+				{
+					"name": "List all device models",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/model",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"model"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a device model",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/model/:modelName",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"model",
+								":modelName"
+							],
+							"variable": [
+								{
+									"key": "modelName",
+									"value": "car",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create or update a device model",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"car\",\r\n    \"name\": \"car model\",\r\n    \"capabilityModel\": {\r\n        \"@id\": \"dtmi:reddyHadrppe:car6t3;1\",\r\n        \"@type\": \"Interface\",\r\n        \"contents\": [\r\n            {\r\n                \"@id\": \"dtmi:reddyHadrppe:car6t3:temperature;1\",\r\n                \"@type\": \"Telemetry\",\r\n                \"displayName\": {\r\n                    \"en\": \"temperature\"\r\n                },\r\n                \"name\": \"temperature\",\r\n                \"schema\": \"double\"\r\n            },\r\n            {\r\n                \"@id\": \"dtmi:reddyHadrppe:car6t3:humidity;1\",\r\n                \"@type\": \"Telemetry\",\r\n                \"displayName\": {\r\n                    \"en\": \"humidity\"\r\n                },\r\n                \"name\": \"humidity\",\r\n                \"schema\": \"double\"\r\n            },\r\n            {\r\n                \"@id\": \"dtmi:reddyHadrppe:car6t3:pressure;1\",\r\n                \"@type\": \"Telemetry\",\r\n                \"displayName\": {\r\n                    \"en\": \"pressure\"\r\n                },\r\n                \"name\": \"pressure\",\r\n                \"schema\": \"double\"\r\n            },\r\n            {\r\n                \"@id\": \"dtmi:reddyHadrppe:car6t3:fanspeed;1\",\r\n                \"@type\": \"Property\",\r\n                \"displayName\": {\r\n                    \"en\": \"fanspeed\"\r\n                },\r\n                \"name\": \"fanspeed\",\r\n                \"schema\": \"double\",\r\n                \"writable\": true\r\n            },\r\n            {\r\n                \"@id\": \"dtmi:reddyHadrppe:car6t3:reboot;1\",\r\n                \"@type\": \"Command\",\r\n                \"commandType\": \"synchronous\",\r\n                \"displayName\": {\r\n                    \"en\": \"reboot\"\r\n                },\r\n                \"name\": \"reboot\"\r\n            },\r\n            {\r\n                \"@id\": \"dtmi:reddyHadrppe:car6t3:dumpdata;1\",\r\n                \"@type\": \"Command\",\r\n                \"displayName\": {\r\n                    \"en\": \"dumpdata\"\r\n                },\r\n                \"name\": \"dumpdata\"\r\n            }\r\n        ],\r\n        \"displayName\": {\r\n            \"en\": \"car\"\r\n        },\r\n        \"@context\": [\r\n            \"dtmi:iotcentral:context;2\",\r\n            \"dtmi:dtdl:context;2\"\r\n        ]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/model",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"model"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a device model",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/model//:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"model",
+								"",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "truck",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "targets",
+			"item": [
+				{
+					"name": "target models",
+					"item": [
+						{
+							"name": "List all target models",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/target/:id/models",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"target",
+										":id",
+										"models"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "app1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create or update a target models",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n    \"car\",\r\n    \"truck\"\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/target/:id/models",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"target",
+										":id",
+										"models"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "app1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a target models",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n    \"car\",\r\n    \"truck\"\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/target/:id/models",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"target",
+										":id",
+										"models"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "app1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "target devices",
+					"item": [
+						{
+							"name": "List all target devices",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/target/:id/device",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"target",
+										":id",
+										"device"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "app1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get target device",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/target/:id/device/:deviceId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"target",
+										":id",
+										"device",
+										":deviceId"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "app1",
+											"type": "string"
+										},
+										{
+											"key": "deviceId",
+											"value": "sim1-app1-coffeemachine-1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a target device",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n    \"car\",\r\n    \"truck\"\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/target/:id/device/:deviceId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"target",
+										":id",
+										"device",
+										":deviceId"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "app1",
+											"type": "string"
+										},
+										{
+											"key": "deviceId",
+											"value": "sim1-app1-coffeemachine-1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a all devices from a target",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n    \"car\",\r\n    \"truck\"\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/target/:id/device",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"target",
+										":id",
+										"device"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "app1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create or update a target device",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"targetId\": \"app1\",\r\n    \"deviceId\": \"sim1-app1-coffeemachine-1\",\r\n    \"connectionString\": \"HostName=iotc-a0d14fb5-a652-401e-b0ec-078fae75ba9c.azure-devices.net;DeviceId=sim1-app1-coffeemachine-1;SharedAccessKey=PYekxGHuioJJkX7y+sIE8h1m4MOe6gYn1YaHJa0BfzI=\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/target/:id/device",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"target",
+										":id",
+										"device"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "app1",
+											"type": "string"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List all targets",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/target",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"target"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a target",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/target/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"target",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "app1",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create or update a target",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"reddy-hadrppe\",\r\n    \"name\": \"reddy hadr test app\",\r\n    \"provisioningUrl\": \"global.azure-devices-provisioning.net\",\r\n    \"idScope\": \"0ne00219C8E\",\r\n    \"masterKey\": \"6DmsWBOI8xSoRd6seHAPsR99UDuTMuF4t3ExR/nUZo14p+J/j+pIf6TcQLEEQxHb/CFWXRYQUC7USC0fUJLYOQ==\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/target",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"target"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a target",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/target/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"target",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "reddy-hadrppe",
+									"type": "string"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "provisioning",
+			"item": [
+				{
+					"name": "Provision Devices",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/simulation/:id/provision/:modelID/:numDevices",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simulation",
+								":id",
+								"provision",
+								":modelID",
+								":numDevices"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "sim1",
+									"type": "string"
+								},
+								{
+									"key": "modelID",
+									"value": "coffeemachine"
+								},
+								{
+									"key": "numDevices",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete devices",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/simulation/:id/provision/:modelID/:numDevices",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"simulation",
+								":id",
+								"provision",
+								":modelID",
+								":numDevices"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "sim1",
+									"type": "string"
+								},
+								{
+									"key": "modelID",
+									"value": "coffeemachine"
+								},
+								{
+									"key": "numDevices",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:6001/api"
+		}
+	]
+}

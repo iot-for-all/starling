@@ -162,3 +162,4 @@ Starling has the following limitations:
 5. **Data rates:** Telemetry rates can be pushed higher based on the network bandwidth, and the message send latency.
    When simulation starts falling behind i.e. message are generated at faster rates that it is able to send, you will
    notice telemetry batches skipped or reported property updates skipped in the dashboard. 
+   

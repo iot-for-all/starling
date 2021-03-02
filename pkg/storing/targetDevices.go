@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
-	"github.com/reddyduggempudi/starling/pkg/models"
+	"github.com/iot-for-all/starling/pkg/models"
 )
 
 type targetDevices struct {

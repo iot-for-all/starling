@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/reddyduggempudi/starling/pkg/controlling"
+	"github.com/iot-for-all/starling/pkg/controlling"
 	"github.com/rs/zerolog/log"
 )
 

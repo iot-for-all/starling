@@ -6,7 +6,7 @@ import (
 	"github.com/amenzhinsky/iothub/common"
 	"github.com/amenzhinsky/iothub/iotdevice"
 	"github.com/hashicorp/go-uuid"
-	"github.com/reddyduggempudi/starling/pkg/models"
+	"github.com/iot-for-all/starling/pkg/models"
 	"math/rand"
 	"strings"
 	"time"

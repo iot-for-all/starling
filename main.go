@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/iot-for-all/starling/pkg/controlling"
+	"github.com/iot-for-all/starling/pkg/serving"
+	"github.com/iot-for-all/starling/pkg/storing"
 	"github.com/mitchellh/go-homedir"
-	"github.com/reddyduggempudi/starling/pkg/controlling"
-	"github.com/reddyduggempudi/starling/pkg/serving"
-	"github.com/reddyduggempudi/starling/pkg/storing"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	flag "github.com/spf13/pflag"

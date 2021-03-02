@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/reddyduggempudi/starling/pkg/models"
-	"github.com/reddyduggempudi/starling/pkg/util"
+	"github.com/iot-for-all/starling/pkg/models"
+	"github.com/iot-for-all/starling/pkg/util"
 )
 
 type (

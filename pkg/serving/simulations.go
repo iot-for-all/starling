@@ -3,8 +3,8 @@ package serving
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/reddyduggempudi/starling/pkg/models"
-	"github.com/reddyduggempudi/starling/pkg/storing"
+	"github.com/iot-for-all/starling/pkg/models"
+	"github.com/iot-for-all/starling/pkg/storing"
 	"io/ioutil"
 	"net/http"
 	"strconv"

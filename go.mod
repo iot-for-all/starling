@@ -1,4 +1,4 @@
-module github.com/reddyduggempudi/starling
+module github.com/iot-for-all/starling
 
 go 1.15
 

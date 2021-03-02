@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/reddyduggempudi/starling/pkg/serving"
-	"github.com/reddyduggempudi/starling/pkg/simulating"
-	"github.com/reddyduggempudi/starling/pkg/storing"
+	"github.com/iot-for-all/starling/pkg/serving"
+	"github.com/iot-for-all/starling/pkg/simulating"
+	"github.com/iot-for-all/starling/pkg/storing"
 )
 
 type (

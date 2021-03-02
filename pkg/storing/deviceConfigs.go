@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/dgraph-io/badger/v3"
-	"github.com/reddyduggempudi/starling/pkg/models"
+	"github.com/iot-for-all/starling/pkg/models"
 )
 
 // deviceConfigs represents the device configurations of a simulation

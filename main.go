@@ -43,6 +43,7 @@ func main() {
 
 	// Initialize the controller.
 	controller := controlling.NewController(ctx, &cfg.Simulation)
+	controller.ResetSimulationStatus()
 
 	// StartSimulation the admin and metrics http endpoints
 	go serving.StartAdmin(&cfg.HTTP, controller)

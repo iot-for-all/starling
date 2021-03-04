@@ -248,7 +248,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\": \"sim1\",\r\n    \"name\": \"sim1\",\r\n    \"targetId\": \"app1\",\r\n    \"status\": \"created\",\r\n    \"waveGroupCount\": 2,\r\n    \"waveGroupInterval\": 10,\r\n    \"telemetryBatchSize\": 5,\r\n    \"telemetryInterval\": 30,\r\n    \"reportedPropertyInterval\": 3600,\r\n    \"disconnectBehavior\": \"never\"\r\n}",
+							"raw": "{\r\n    \"id\": \"sim1\",\r\n    \"name\": \"sim1\",\r\n    \"targetId\": \"app1\",\r\n    \"status\": \"created\",\r\n    \"waveGroupCount\": 2,\r\n    \"waveGroupInterval\": 10,\r\n    \"telemetryBatchSize\": 5,\r\n    \"telemetryInterval\": 30,\r\n    \"reportedPropertyInterval\": 3600,\r\n    \"disconnectBehavior\": \"never\",\r\n    \"telemetryFormat\": \"default\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

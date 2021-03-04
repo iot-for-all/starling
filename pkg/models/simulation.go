@@ -9,6 +9,9 @@ type (
 	// DeviceDisconnectBehavior defines the disconnection behavior of the simulated device.
 	DeviceDisconnectBehavior string
 
+	// TelemetryFormat defines the format of the telemetry messages sent from the simulated device.
+	TelemetryFormat string
+
 	// SimulationStatus specifies the current status of the simulation.
 	SimulationStatus string
 
@@ -31,6 +34,7 @@ type (
 		TelemetryInterval     int                      `json:"telemetryInterval"`        // interval to wait between sending telemetry messages.
 		ReportedPropsInterval int                      `json:"reportedPropertyInterval"` // interval to wait between sending reported properties.
 		DisconnectBehavior    DeviceDisconnectBehavior `json:"disconnectBehavior"`       // device connection behavior.
+		TelemetryFormat       TelemetryFormat          `json:"telemetryFormat"`          // format of telemetry messages.
 	}
 )
 
@@ -50,9 +54,13 @@ const (
 
 	// DeviceDisconnectNever specifies that the device should never disconnect.
 	DeviceDisconnectNever DeviceDisconnectBehavior = "never"
-
 	// DeviceDisconnectAfterTelemetrySend specifies that the device should disconnect after sending telemetry.
 	DeviceDisconnectAfterTelemetrySend DeviceDisconnectBehavior = "telemetry"
+
+	// TelemetryFormatDefault specifies that the device sends telemetry in default JSON format.
+	TelemetryFormatDefault TelemetryFormat = "default"
+	// TelemetryFormatOpcua specifies that the device sends telemetry in opcua JSON format.
+	TelemetryFormatOpcua TelemetryFormat = "opcua"
 )
 
 // UnmarshalJSON handles the un-marshalling of simulation status
@@ -94,10 +102,33 @@ func (d *DeviceDisconnectBehavior) UnmarshalJSON(b []byte) error {
 
 	s := DeviceDisconnectBehavior(p)
 	switch s {
-	case DeviceDisconnectNever, DeviceDisconnectAfterTelemetrySend:
+	case DeviceDisconnectNever,
+		DeviceDisconnectAfterTelemetrySend:
 		*d = s
 		return nil
 	default:
 		return fmt.Errorf("invalid device disconnect type %s", p)
+	}
+}
+
+// UnmarshalJSON handles the un-marshalling of telemetry format
+func (tf *TelemetryFormat) UnmarshalJSON(b []byte) error {
+	var p string
+	if err := json.Unmarshal(b, &p); err != nil {
+		return err
+	}
+
+	if p == "" {
+		return nil
+	}
+
+	s := TelemetryFormat(p)
+	switch s {
+	case TelemetryFormatDefault,
+		TelemetryFormatOpcua:
+		*tf = s
+		return nil
+	default:
+		return fmt.Errorf("invalid telemetry format type %s", p)
 	}
 }

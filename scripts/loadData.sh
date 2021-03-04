@@ -260,6 +260,7 @@ curl --location --request PUT 'http://localhost:6001/api/target/app1/models' \
 # Reported properties are sent once an hour.
 # Devices are never disconnected. To simulate an occasionally connected device,
 # you can change the disconnectBehavior to 'telemetry' to disconnect the device after sending telemetry.
+# A telemetryFormat 'default' sends typical json messages. If it is set to 'opcua', json messages with opcua envelopes will be sent.
 curl --location --request PUT 'http://localhost:6001/api/simulation' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -272,7 +273,8 @@ curl --location --request PUT 'http://localhost:6001/api/simulation' \
     "telemetryBatchSize": 2,
     "telemetryInterval": 60,
     "reportedPropertyInterval": 3600,
-    "disconnectBehavior": "never"
+    "disconnectBehavior": "never",
+    "telemetryFormat": "default"
 }'
 
 ## Configure number of devices for the simulation.

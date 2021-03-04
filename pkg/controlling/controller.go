@@ -198,3 +198,20 @@ func (c *Controller) deleteDevice(ctx context.Context, target *models.Simulation
 	// ignore errors
 	_ = storing.TargetDevices.Delete(target.ID, deviceID)
 }
+
+// ResetSimulationStatus resets all simulation status to stopped
+func (c *Controller) ResetSimulationStatus() error {
+	sims, err := storing.Simulations.List()
+	if err != nil {
+		return err
+	}
+
+	for _, sim := range sims {
+		sim.Status = models.SimulationStatusStopped
+		err := storing.Simulations.Set(&sim)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

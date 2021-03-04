@@ -54,14 +54,14 @@ func Start(
 		return nil, err
 	}
 
-	models := map[string]*models.DeviceModel{}
+	deviceModels := map[string]*models.DeviceModel{}
 	for _, deviceConfig := range deviceConfigs {
 		model, err := storing.DeviceModels.Get(deviceConfig.ModelID)
 		if err != nil {
 			return nil, err
 		}
 
-		models[model.ID] = model
+		deviceModels[model.ID] = model
 
 		simulatedDeviceGauge.WithLabelValues(simulation.ID, simulation.TargetID, deviceConfig.ModelID).Set(float64(deviceConfig.DeviceCount))
 	}
@@ -74,7 +74,7 @@ func Start(
 		simulation:      simulation,
 		target:          target,
 		deviceConfigs:   deviceConfigs,
-		models:          models,
+		models:          deviceModels,
 		deviceGroups:    make(map[int]*deviceCollection),
 		provisioner:     NewProvisioner(simContext, config),
 		deviceSimulator: newDeviceSimulator(simContext, config, simulation),
@@ -91,6 +91,11 @@ func Start(
 
 // start starts the simulation pumps
 func (s *Simulator) start() {
+	// update the status of simulation
+	if err := updateSimulationStatus(s.simulation, models.SimulationStatusStarting); err != nil {
+		log.Error().Err(err).Msg("error updating simulation status")
+	}
+
 	totalDevices := 0
 	for _, dc := range s.deviceConfigs {
 		totalDevices += dc.DeviceCount
@@ -116,6 +121,11 @@ func (s *Simulator) start() {
 	// start reported props request generator pump
 	if s.config.EnableReportedProps {
 		go s.startReportedPropertyRequestPump()
+	}
+
+	// update the status of simulation
+	if err := updateSimulationStatus(s.simulation, models.SimulationStatusRunning); err != nil {
+		log.Error().Err(err).Msg("error updating simulation status")
 	}
 }
 
@@ -248,6 +258,14 @@ func (s *Simulator) startReportedPropertyRequestPump() {
 
 // Stop stops the simulation
 func (s *Simulator) Stop() error {
+	// update the status of simulation
+	log.Trace().
+		Str("simID", s.simulation.ID).
+		Msg("stopping simulation")
+	if err := updateSimulationStatus(s.simulation, models.SimulationStatusStopping); err != nil {
+		return err
+	}
+
 	s.cancel() // send cancellation signal to all go funcs.
 
 	s.deviceSimulator.stop()
@@ -258,6 +276,15 @@ func (s *Simulator) Stop() error {
 			s.deviceSimulator.disconnectDevice(dev)
 		}
 	}
+
+	// update the status of simulation
+	if err := updateSimulationStatus(s.simulation, models.SimulationStatusStopped); err != nil {
+		return err
+	}
+
+	log.Debug().
+		Str("simID", s.simulation.ID).
+		Msg("simulation stopped")
 
 	return nil
 }
@@ -336,4 +363,11 @@ func sleep(ctx context.Context, duration time.Duration) {
 // randSleep sleeps for random time within the given min/max range with cancellation context
 func randSleep(ctx context.Context, minMs int, maxMs int) {
 	sleep(ctx, time.Millisecond*time.Duration(minMs+rand.Intn(maxMs)))
+}
+
+func updateSimulationStatus(simulation *models.Simulation, status models.SimulationStatus) error {
+	// update the status of simulation
+	simulation.Status = status
+	err := storing.Simulations.Set(simulation)
+	return err
 }

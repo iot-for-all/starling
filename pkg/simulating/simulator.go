@@ -185,7 +185,7 @@ func (s *Simulator) startReportedPropertyRequestPump() {
 	select {
 	case <-s.context.Done():
 		return
-	case <-time.After(time.Minute * time.Duration(2)):
+	case <-time.After(time.Minute * time.Duration(5)):
 	}
 
 	log.Debug().Msg("reported properties request generator pump starting")
@@ -297,6 +297,7 @@ func (s *Simulator) distributeDeviceGroups() {
 				s.deviceGroups[group] = new(deviceCollection)
 			}
 
+			deviceContext, deviceCancel := context.WithCancel(s.context)
 			d := device{
 				deviceID:             deviceID,
 				model:                model,
@@ -310,6 +311,9 @@ func (s *Simulator) distributeDeviceGroups() {
 				iotHubClient:         nil,
 				twinSub:              nil,
 				c2dSub:               nil,
+				retryCount:           0,
+				cancel:               deviceCancel,
+				context:              deviceContext,
 				dataGenerator: &DataGenerator{
 					CapabilityModel: model.ParseDeviceCapabilityModel(),
 				},

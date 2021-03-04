@@ -36,6 +36,8 @@ type (
 		c2dSub               *iotdevice.EventSub      // subscription to listen for c2d commands
 		dataGenerator        *DataGenerator           // data generator used to generate telemetry and reported property updates.
 		retryCount           int                      // number of retries for sending telemetry
+		cancel               context.CancelFunc       // cancel function to invoke when the device is being disconnected.
+		context              context.Context          // the context of the device.
 	}
 
 	// deviceCollection represents collection of devices used in device groups.
@@ -241,10 +243,10 @@ func (s *deviceSimulator) sendTelemetryMessage(msg *telemetryMessage, req *telem
 	start := time.Now()
 	var err error
 	if useMock {
-		randSleep(s.context, 500, 5000)
+		randSleep(req.device.context, 500, 5000)
 	} else {
 		// send telemetry to IoT Central
-		timeoutCtx, _ := context.WithTimeout(s.context, time.Millisecond*time.Duration(s.config.TelemetryTimeout))
+		timeoutCtx, _ := context.WithTimeout(req.device.context, time.Millisecond*time.Duration(s.config.TelemetryTimeout))
 		err = req.device.iotHubClient.SendEvent(timeoutCtx, msg.body,
 			iotdevice.WithSendCorrelationID(msg.correlationID),
 			iotdevice.WithSendMessageID(msg.messageID),
@@ -294,7 +296,7 @@ func (s *deviceSimulator) sendReportedProps(req *reportedPropsRequest) {
 		}
 	}
 
-	//desired, reported, _ := req.device.iotHubClient.RetrieveTwinState(s.context)
+	//desired, reported, _ := req.device.iotHubClient.RetrieveTwinState(req.device.context)
 	//log.Debug().Str("deviceID", req.device.deviceID).Msg(fmt.Sprintf("current desired: %v, reported: %v", desired, reported))
 
 	// generate reported properties
@@ -307,7 +309,7 @@ func (s *deviceSimulator) sendReportedProps(req *reportedPropsRequest) {
 	log.Trace().Str("deviceID", req.device.deviceID).Msg(fmt.Sprintf("about to update reported props: %v", reportedProps))
 
 	// send the reported properties to IoT Central
-	timeoutCtx, _ := context.WithTimeout(s.context, time.Millisecond*time.Duration(s.config.TwinUpdateTimeout))
+	timeoutCtx, _ := context.WithTimeout(req.device.context, time.Millisecond*time.Duration(s.config.TwinUpdateTimeout))
 	_, err = req.device.iotHubClient.UpdateTwinState(timeoutCtx, reportedProps)
 	if err != nil {
 		reportedPropsFailureTotal.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID, s.getErrorType(err)).Add(1)
@@ -347,7 +349,7 @@ func (s *deviceSimulator) provisionDevice(device *device, useCache bool) bool {
 	// provision the device for the first time
 	req := &ProvisioningRequest{
 		DeviceID:   device.deviceID,
-		Context:    s.context,
+		Context:    device.context,
 		Target:     device.target,
 		Simulation: s.simulation,
 		Model:      device.model,
@@ -401,7 +403,7 @@ func (s *deviceSimulator) connectDevice(device *device) bool {
 	hub := getHubName(device.connectionString)
 
 	if useMock {
-		randSleep(s.context, 500, 1000)
+		randSleep(device.context, 500, 1000)
 	} else {
 		var err error
 
@@ -417,7 +419,7 @@ func (s *deviceSimulator) connectDevice(device *device) bool {
 		}
 
 		log.Trace().Str("deviceID", device.deviceID).Str("connectionString", device.connectionString).Msg("trying to connect to iothub")
-		timeoutCtx, _ := context.WithTimeout(s.context, time.Millisecond*time.Duration(s.config.ConnectionTimeout))
+		timeoutCtx, _ := context.WithTimeout(device.context, time.Millisecond*time.Duration(s.config.ConnectionTimeout))
 		if err = device.iotHubClient.Connect(timeoutCtx); err != nil {
 			device.isConnecting = false
 			log.Error().Err(err).Str("deviceID", device.deviceID).Msg("error connecting to IoT Hub")
@@ -440,7 +442,7 @@ func (s *deviceSimulator) connectDevice(device *device) bool {
 					iotdevice.WithLogger(logger.New(logger.LevelDebug, func(lvl logger.Level, s string) {
 						log.Trace().Msg(s)
 					})))
-				timeoutCtx, _ := context.WithTimeout(s.context, time.Millisecond*time.Duration(s.config.ConnectionTimeout))
+				timeoutCtx, _ := context.WithTimeout(device.context, time.Millisecond*time.Duration(s.config.ConnectionTimeout))
 				if err = device.iotHubClient.Connect(timeoutCtx); err != nil {
 					log.Error().Err(err).Str("deviceID", device.deviceID).Str("connectionString", device.connectionString).Msg("error connecting to IoT Hub")
 					return false
@@ -483,9 +485,12 @@ func (s *deviceSimulator) disconnectDevice(device *device) bool {
 	hub := getHubName(device.connectionString)
 
 	if useMock {
-		randSleep(s.context, 500, 1000)
+		randSleep(device.context, 500, 1000)
 	} else {
 		if device.iotHubClient != nil {
+			// stop all go functions e.g.: twin update acknowledgements, command acknowledgements
+			device.cancel()
+
 			// unregister for twin updates
 			if s.config.EnableTwinUpdateAcks {
 				s.unsubscribeTwinUpdates(device)
@@ -498,6 +503,8 @@ func (s *deviceSimulator) disconnectDevice(device *device) bool {
 
 			_ = device.iotHubClient.Close()
 			device.iotHubClient = nil
+			device.context, device.cancel = context.WithCancel(s.context)
+
 		}
 	}
 	log.Trace().Str("deviceID", device.deviceID).Msg("disconnected device from IoT Hub")
@@ -516,7 +523,7 @@ func (s *deviceSimulator) disconnectDevice(device *device) bool {
 // subscribeTwinUpdates creates subscription to monitor twin update (desired property) requests fpr a given device
 func (s *deviceSimulator) subscribeTwinUpdates(device *device) bool {
 	var err error
-	timeoutCtx, _ := context.WithTimeout(s.context, time.Millisecond*time.Duration(s.config.TwinUpdateTimeout))
+	timeoutCtx, _ := context.WithTimeout(device.context, time.Millisecond*time.Duration(s.config.TwinUpdateTimeout))
 	device.twinSub, err = device.iotHubClient.SubscribeTwinUpdates(timeoutCtx)
 	if err != nil {
 		// TODO: add retry
@@ -527,7 +534,7 @@ func (s *deviceSimulator) subscribeTwinUpdates(device *device) bool {
 	go func() {
 		for {
 			select {
-			case <-s.context.Done():
+			case <-device.context.Done():
 				log.Trace().Str("deviceID", device.deviceID).Msg("device twin subscription stopped")
 				return
 			case desiredTwin := <-device.twinSub.C():
@@ -539,7 +546,7 @@ func (s *deviceSimulator) subscribeTwinUpdates(device *device) bool {
 				// acknowledge twin update by echoing reported properties
 				reportedTwin := device.dataGenerator.GenerateTwinUpdateAck(desiredTwin)
 				start := time.Now()
-				timeoutCtx, _ := context.WithTimeout(s.context, time.Millisecond*time.Duration(s.config.TwinUpdateTimeout))
+				timeoutCtx, _ := context.WithTimeout(device.context, time.Millisecond*time.Duration(s.config.TwinUpdateTimeout))
 				_, err := device.iotHubClient.UpdateTwinState(timeoutCtx, reportedTwin)
 				end := time.Now()
 				latency := float64(end.UnixNano()-start.UnixNano()) / float64(time.Second)
@@ -578,7 +585,7 @@ func (s *deviceSimulator) subscribeCommands(device *device) bool {
 	for _, component := range device.dataGenerator.CapabilityModel.Components {
 		for _, command := range component.Commands {
 			if command.IsSync {
-				timeoutCtx, _ := context.WithTimeout(s.context, time.Millisecond*time.Duration(s.config.CommandTimeout))
+				timeoutCtx, _ := context.WithTimeout(device.context, time.Millisecond*time.Duration(s.config.CommandTimeout))
 				err := device.iotHubClient.RegisterMethod(timeoutCtx, command.Name, func(p map[string]interface{}) (map[string]interface{}, error) {
 					// acknowledge the c2d command by a reply
 					// TODO: need to figure out how to respond with proper return types based on the DCM
@@ -601,7 +608,7 @@ func (s *deviceSimulator) subscribeCommands(device *device) bool {
 	// register for C2D (Async) Commands
 	if hasAsyncCommands {
 		var err error
-		timeoutCtx, _ := context.WithTimeout(s.context, time.Millisecond*time.Duration(s.config.CommandTimeout))
+		timeoutCtx, _ := context.WithTimeout(device.context, time.Millisecond*time.Duration(s.config.CommandTimeout))
 		device.c2dSub, err = device.iotHubClient.SubscribeEvents(timeoutCtx)
 		if err != nil {
 			log.Err(err).Str("deviceID", device.deviceID).Msg("c2d command subscription failed")
@@ -610,7 +617,7 @@ func (s *deviceSimulator) subscribeCommands(device *device) bool {
 		go func() {
 			for {
 				select {
-				case <-s.context.Done():
+				case <-device.context.Done():
 					log.Trace().Str("deviceID", device.deviceID).Msg("c2d subscription stopped")
 					return
 				case msg := <-device.c2dSub.C():

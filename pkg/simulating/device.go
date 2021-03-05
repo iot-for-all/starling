@@ -38,6 +38,7 @@ type (
 		retryCount           int                      // number of retries for sending telemetry
 		cancel               context.CancelFunc       // cancel function to invoke when the device is being disconnected.
 		context              context.Context          // the context of the device.
+		simulation           *models.Simulation       // the simulation that the device belongs to
 	}
 
 	// deviceCollection represents collection of devices used in device groups.

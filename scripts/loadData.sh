@@ -13,12 +13,12 @@ curl --location --request PUT 'http://localhost:6001/api/target' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "id": "app1",
-    "name": "'$APP_DESCRIPTION'",
+    "name": "'"$APP_DESCRIPTION"'",
     "provisioningUrl": "global.azure-devices-provisioning.net",
-    "idScope": "'$ID_SCOPE'",
-    "masterKey": "'$MASTER_KEY'",
-    "appUrl": "'$APP_URL'",
-    "appToken": "'$API_TOKEN'"
+    "idScope": "'"$ID_SCOPE"'",
+    "masterKey": "'"$MASTER_KEY"'",
+    "appUrl": "'"$APP_URL"'",
+    "appToken": "'"$API_TOKEN"'"
 }'
 
 ## Add a device model.
@@ -270,7 +270,7 @@ curl --location --request PUT 'http://localhost:6001/api/simulation' \
     "status": "created",
     "waveGroupCount": 2,
     "waveGroupInterval": 5,
-    "telemetryBatchSize": 2,
+    "telemetryBatchSize": 1,
     "telemetryInterval": 60,
     "reportedPropertyInterval": 3600,
     "disconnectBehavior": "never",

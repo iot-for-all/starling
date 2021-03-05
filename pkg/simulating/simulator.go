@@ -341,6 +341,7 @@ func (s *Simulator) distributeDeviceGroups() {
 				retryCount:           0,
 				cancel:               deviceCancel,
 				context:              deviceContext,
+				simulation:           s.simulation,
 				dataGenerator: &DataGenerator{
 					CapabilityModel: model.ParseDeviceCapabilityModel(),
 				},

@@ -46,94 +46,66 @@ var (
 
 // GenerateTelemetryMessage generate a telemetry messages based on the device capability model.
 func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime time.Time) []*telemetryMessage {
-	/*
-		// TODO: Handle components
-		telemetryMsgs := make([]*telemetryMessage, len(d.CapabilityModel.Components))
+	// TODO: Handle components
 
-		for i, comp := range d.CapabilityModel.Components {
-			msg := make(map[string]interface{})
-			for _, telemetry := range comp.Telemetry {
-				name := telemetry.Name
-				switch telemetry.Schema {
-				case "boolean":
-					msg[name] = d.getBool()
-				case "date":
-					msg[name] = d.getDate()
-				case "datetime":
-					msg[name] = d.getDateTime()
-				case "double":
-					msg[name] = d.getDouble()
-				case "duration":
-					msg[name] = d.getDuration()
-				case "float":
-					msg[name] = d.getFloat()
-				case "geopoint":
-					msg[name] = d.getGeopoint()
-				case "integer":
-					msg[name] = d.getInt()
-				case "long":
-					msg[name] = d.getLong()
-				case "string":
-					msg[name] = d.getString()
-				case "time":
-					msg[name] = d.getTime()
-				}
-			}
-			body, _ := json.Marshal(msg)
-			correlationID, _ := uuid.GenerateUUID()
-			messageID, _ := uuid.GenerateUUID()
-			tm := telemetryMessage{
-				body:               body,
-				interfaceId:        "",
-				connectionDeviceID: device.deviceID,
-				connectionModuleID: "",
-				contentEncoding:    "",
-				contentType:        "Content-Type: application/json",
-				correlationID:      correlationID,
-				messageID:          messageID,
-				creationTimeUtc:    creationTime, // distribute the messages in the batch evenly
-				properties: map[string]string{
-					"component": comp.ComponentName,
-				},
-			}
-			telemetryMsgs[i] = &tm
-		}*/
+	telemetryMessages := make([]*telemetryMessage, 1)
 
-	telemetryMsgs := make([]*telemetryMessage, 1)
-
-	msg := make(map[string]interface{})
 	dataPointCount := 0
-	for _, comp := range d.CapabilityModel.Components {
-		for _, telemetry := range comp.Telemetry {
-			name := telemetry.Name
-			switch telemetry.Schema {
-			case "boolean":
-				msg[name] = d.getBool()
-			case "date":
-				msg[name] = d.getDate()
-			case "datetime":
-				msg[name] = d.getDateTime()
-			case "double":
-				msg[name] = d.getDouble()
-			case "duration":
-				msg[name] = d.getDuration()
-			case "float":
-				msg[name] = d.getFloat()
-			case "geopoint":
-				msg[name] = d.getGeopoint()
-			case "integer":
-				msg[name] = d.getInt()
-			case "long":
-				msg[name] = d.getLong()
-			case "string":
-				msg[name] = d.getString(10)
-			case "time":
-				msg[name] = d.getTime()
-			}
-			dataPointCount++
+	var body []byte
+	if device.simulation.TelemetryFormat == models.TelemetryFormatOpcua {
+		// OPCUA device sending JSON payload
+		msgGuid, _ := uuid.GenerateUUID()
+		payload := make(map[string]interface{})
+		msgList := make([]map[string]interface{}, 1)
+		msgList[0] = map[string]interface{}{
+			"DataSetWriterId": fmt.Sprintf("%s-%s", device.deviceID, msgGuid),
+			"MetaDataVersion": map[string]interface{}{
+				"MajorVersion": 1,
+				"MinorVersion": 0,
+			},
+			"SequenceNumber": rand.Intn(100000),
+			"Status":         nil,
+			"Timestamp":      d.getDateTime,
+			"Payload":        payload,
 		}
+
+		eventId, _ := uuid.GenerateUUID()
+		telemetryValues := map[string]interface{}{
+			"DataSetClassId":     nil,
+			"DataSetWriterGroup": device.deviceID,
+			"EventId":            eventId,
+			"MessageId":          d.getString(5),
+			"MessageType":        "ua-data",
+			"PublisherId":        "Standalone_IIOTEdgeServer_opcpublisher",
+			"Messages":           msgList,
+		}
+
+		for _, comp := range d.CapabilityModel.Components {
+			for _, telemetry := range comp.Telemetry {
+				opcuaNodeId := fmt.Sprintf("nsu=%s;s=%s", d.getString(20), d.getString(20))
+				payload[opcuaNodeId] = map[string]interface{}{
+					"ServerTimestamp": time.Now(),
+					"SourceTimestamp": time.Now(),
+					"StatusCode":      nil,
+					"--name--":        telemetry.Name,
+					"Value":           d.getRandomValue(telemetry.Schema),
+				}
+				dataPointCount++
+			}
+		}
+
+		body, _ = json.Marshal(telemetryValues)
+	} else {
+		// typical device sending plain JSON payload confirming the DTDL model
+		msg := make(map[string]interface{})
+		for _, comp := range d.CapabilityModel.Components {
+			for _, telemetry := range comp.Telemetry {
+				msg[telemetry.Name] = d.getRandomValue(telemetry.Schema)
+				dataPointCount++
+			}
+		}
+		body, _ = json.Marshal(msg)
 	}
-	body, _ := json.Marshal(msg)
 	correlationID, _ := uuid.GenerateUUID()
 	messageID, _ := uuid.GenerateUUID()
 	tm := telemetryMessage{
@@ -149,9 +121,9 @@ func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime ti
 		properties:         nil,
 		dataPointCount:     dataPointCount,
 	}
-	telemetryMsgs[0] = &tm
+	telemetryMessages[0] = &tm
 
-	return telemetryMsgs
+	return telemetryMessages
 }
 
 // GenerateReportedProperties generate reported property update based on the device capability model.
@@ -160,31 +132,7 @@ func (d *DataGenerator) GenerateReportedProperties(device *device) (iotdevice.Tw
 	for _, comp := range d.CapabilityModel.Components {
 		for _, prop := range comp.Properties {
 			if prop.Writable == false {
-				name := prop.Name
-				switch prop.Schema {
-				case "boolean":
-					reportedProps[name] = d.getBool()
-				case "date":
-					reportedProps[name] = d.getDate()
-				case "datetime":
-					reportedProps[name] = d.getDateTime()
-				case "double":
-					reportedProps[name] = d.getDouble()
-				case "duration":
-					reportedProps[name] = d.getDuration()
-				case "float":
-					reportedProps[name] = d.getFloat()
-				case "geopoint":
-					reportedProps[name] = d.getGeopoint()
-				case "integer":
-					reportedProps[name] = d.getInt()
-				case "long":
-					reportedProps[name] = d.getLong()
-				case "string":
-					reportedProps[name] = d.getString(10)
-				case "time":
-					reportedProps[name] = d.getTime()
-				}
+				reportedProps[prop.Name] = d.getRandomValue(prop.Schema)
 			}
 		}
 	}
@@ -236,6 +184,34 @@ func (d *DataGenerator) GenerateC2DAck(c2dMsg *common.Message) *common.Message {
 	var response common.Message
 
 	return &response
+}
+
+func (d *DataGenerator) getRandomValue(schema string) interface{} {
+	switch schema {
+	case "boolean":
+		return d.getBool()
+	case "date":
+		return d.getDate()
+	case "datetime":
+		return d.getDateTime()
+	case "double":
+		return d.getDouble()
+	case "duration":
+		return d.getDuration()
+	case "float":
+		return d.getFloat()
+	case "geopoint":
+		return d.getGeopoint()
+	case "integer":
+		return d.getInt()
+	case "long":
+		return d.getLong()
+	case "string":
+		return d.getString(10)
+	case "time":
+		return d.getTime()
+	}
+	return ""
 }
 
 // getBool get a random boolean value.

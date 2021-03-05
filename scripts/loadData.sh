@@ -271,8 +271,8 @@ curl --location --request PUT 'http://localhost:6001/api/simulation' \
     "waveGroupCount": 2,
     "waveGroupInterval": 5,
     "telemetryBatchSize": 1,
-    "telemetryInterval": 60,
-    "reportedPropertyInterval": 3600,
+    "telemetryInterval": 120,
+    "reportedPropertyInterval": 14400,
     "disconnectBehavior": "never",
     "telemetryFormat": "default"
 }'

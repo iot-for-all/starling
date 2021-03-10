@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"strings"
+
 	"github.com/iot-for-all/starling/pkg/controlling"
 	"github.com/iot-for-all/starling/pkg/serving"
 	"github.com/iot-for-all/starling/pkg/storing"
@@ -11,9 +15,6 @@ import (
 	"github.com/rs/zerolog/log"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"os"
-	"os/signal"
-	"strings"
 )
 
 func main() {
@@ -121,7 +122,7 @@ Simulation:
 Data:
     dataDirectory: "."                  # Directory used for storing Simulation data.
 Logger:
-    logLevel: debug				        # Logging legel for the logger. Available logging levels are - panic, fatal, error, warn, info, debug, trace.
+    logLevel: debug				        # Logging level for the logger. Available logging levels are - panic, fatal, error, warn, info, debug, trace.
 
 \n`)
 			return nil, err

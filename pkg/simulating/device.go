@@ -247,6 +247,7 @@ func (s *deviceSimulator) sendTelemetryMessage(msg *telemetryMessage, req *telem
 		randSleep(req.device.context, 500, 5000)
 	} else {
 		// send telemetry to IoT Central
+		log.Trace().Str("payload", string(msg.body)).Int("size", len(msg.body)).Msg("about to send telemetry message")
 		timeoutCtx, _ := context.WithTimeout(req.device.context, time.Millisecond*time.Duration(s.config.TelemetryTimeout))
 		err = req.device.iotHubClient.SendEvent(timeoutCtx, msg.body,
 			iotdevice.WithSendCorrelationID(msg.correlationID),
@@ -667,8 +668,12 @@ func (s *deviceSimulator) getNextTelemetryBatch(device *device) *telemetryBatch 
 
 	for i := 0; i < batchSize; i++ {
 		creationTime := now.Add(time.Millisecond * time.Duration(-(i * multiplier))) // distribute the messages in the batch evenly
-		messages := device.dataGenerator.GenerateTelemetryMessage(device, creationTime)
-		batch.messages = append(batch.messages, messages...)
+		messages, err := device.dataGenerator.GenerateTelemetryMessage(device, creationTime)
+		if err != nil {
+			log.Error().Err(err).Msg("error generating telemetry messages")
+		} else {
+			batch.messages = append(batch.messages, messages...)
+		}
 	}
 
 	return &batch

@@ -26,7 +26,10 @@ type store struct {
 func Open(cfg *Config) error {
 	// TODO: Open with correct badger options
 	dbFile := fmt.Sprintf("%s/.db", cfg.DataDirectory)
-	d, err := badger.Open(badger.DefaultOptions(dbFile))
+	opts := badger.DefaultOptions(dbFile)
+	//b, _ := json.MarshalIndent(opts, "", "  ")
+	//fmt.Printf("%s\n", b)
+	d, err := badger.Open(opts)
 	if err != nil {
 		return err
 	}

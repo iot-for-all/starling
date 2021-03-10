@@ -2,6 +2,7 @@ package simulating
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"math/rand"
@@ -59,6 +60,9 @@ func Start(
 		model, err := storing.DeviceModels.Get(deviceConfig.ModelID)
 		if err != nil {
 			return nil, err
+		}
+		if model == nil {
+			return nil, errors.New(fmt.Sprintf("could not find '%s' model in model store, but specified in deviceconfigs for simulation '%s'", deviceConfig.ModelID, simulation.ID))
 		}
 
 		deviceModels[model.ID] = model

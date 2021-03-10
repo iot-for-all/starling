@@ -12,11 +12,13 @@ import (
 	"time"
 )
 
-// DataGenerator generates telemetry messages and reported property updates based on the device capability model.
-type DataGenerator struct {
-	CapabilityModel *models.DeviceCapabilityModel // the capability model of the device.
-	nextGeoPoint    int                           // geo point to be used next from the geopointRoute
-}
+type (
+	// DataGenerator generates telemetry messages and reported property updates based on the device capability model.
+	DataGenerator struct {
+		CapabilityModel *models.DeviceCapabilityModel // the capability model of the device.
+		nextGeoPoint    int                           // geo point to be used next from the geopointRoute
+	}
+)
 
 var (
 	geopointRoute = [][2]float64{
@@ -45,13 +47,14 @@ var (
 )
 
 // GenerateTelemetryMessage generate a telemetry messages based on the device capability model.
-func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime time.Time) []*telemetryMessage {
+func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime time.Time) ([]*telemetryMessage, error) {
 	// TODO: Handle components
 
 	telemetryMessages := make([]*telemetryMessage, 1)
 
 	dataPointCount := 0
 	var body []byte
+	var err error
 	if device.simulation.TelemetryFormat == models.TelemetryFormatOpcua {
 		// OPCUA device sending JSON payload
 		msgGuid, _ := uuid.GenerateUUID()
@@ -65,7 +68,7 @@ func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime ti
 			},
 			"SequenceNumber": rand.Intn(100000),
 			"Status":         nil,
-			"Timestamp":      d.getDateTime,
+			"Timestamp":      d.getDateTime(),
 			"Payload":        payload,
 		}
 
@@ -83,18 +86,24 @@ func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime ti
 		for _, comp := range d.CapabilityModel.Components {
 			for _, telemetry := range comp.Telemetry {
 				opcuaNodeId := fmt.Sprintf("nsu=%s;s=%s", d.getString(20), d.getString(20))
+				telemetryName := telemetry.Name
+				telemetryValue := d.getRandomValue(telemetry.Schema)
 				payload[opcuaNodeId] = map[string]interface{}{
 					"ServerTimestamp": time.Now(),
 					"SourceTimestamp": time.Now(),
 					"StatusCode":      nil,
-					"--name--":        telemetry.Name,
-					"Value":           d.getRandomValue(telemetry.Schema),
+					//"Name":            telemetryName,
+					"Value": telemetryValue,
 				}
+				telemetryValues[telemetryName] = telemetryValue
 				dataPointCount++
 			}
 		}
 
-		body, _ = json.Marshal(telemetryValues)
+		body, err = json.Marshal(telemetryValues)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		// typical device sending plain JSON payload confirming the DTDL model
 		msg := make(map[string]interface{})
@@ -104,7 +113,10 @@ func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime ti
 				dataPointCount++
 			}
 		}
-		body, _ = json.Marshal(msg)
+		body, err = json.Marshal(msg)
+		if err != nil {
+			return nil, err
+		}
 	}
 	correlationID, _ := uuid.GenerateUUID()
 	messageID, _ := uuid.GenerateUUID()
@@ -123,7 +135,7 @@ func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime ti
 	}
 	telemetryMessages[0] = &tm
 
-	return telemetryMessages
+	return telemetryMessages, nil
 }
 
 // GenerateReportedProperties generate reported property update based on the device capability model.

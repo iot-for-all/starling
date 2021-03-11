@@ -13,6 +13,15 @@
         "schema": "double"
       },
       {
+        "@id": "dtmi:CoffeeCo:Brewer:MsgGenTime;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "MsgGenTime"
+        },
+        "name": "MsgGenTime",
+        "schema": "datetime"
+      },
+      {
         "@id": "dtmi:CoffeeCo:Brewer:StartBrew;1",
         "@type": "Command",
         "commandType": "synchronous",

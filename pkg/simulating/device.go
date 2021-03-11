@@ -4,6 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"runtime"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/amenzhinsky/iothub/common"
 	"github.com/amenzhinsky/iothub/iotdevice"
 	iotmqtt "github.com/amenzhinsky/iothub/iotdevice/transport/mqtt"
@@ -12,11 +18,6 @@ import (
 	"github.com/iot-for-all/starling/pkg/storing"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog/log"
-	"reflect"
-	"runtime"
-	"strings"
-	"sync"
-	"time"
 )
 
 type (
@@ -522,7 +523,7 @@ func (s *deviceSimulator) disconnectDevice(device *device) bool {
 	return true
 }
 
-// subscribeTwinUpdates creates subscription to monitor twin update (desired property) requests fpr a given device
+// subscribeTwinUpdates creates subscription to monitor twin update (desired property) requests for a given device
 func (s *deviceSimulator) subscribeTwinUpdates(device *device) bool {
 	var err error
 	timeoutCtx, _ := context.WithTimeout(device.context, time.Millisecond*time.Duration(s.config.TwinUpdateTimeout))

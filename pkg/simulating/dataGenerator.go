@@ -199,7 +199,7 @@ func (d *DataGenerator) GenerateC2DAck(c2dMsg *common.Message) *common.Message {
 }
 
 func (d *DataGenerator) getRandomValue(schema string) interface{} {
-	switch schema {
+	switch strings.ToLower(schema) {
 	case "boolean":
 		return d.getBool()
 	case "date":

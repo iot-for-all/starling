@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
+	"path"
 	"strings"
 
 	"github.com/iot-for-all/starling/pkg/controlling"
@@ -15,6 +17,7 @@ import (
 	"github.com/rs/zerolog/log"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func main() {
@@ -144,7 +147,33 @@ Logger:
 
 // initLogger initializes the logger with output format
 func initLogger(cfg *config) {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05"})
+	var writers []io.Writer
+	writers = append(writers, zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05"})
+
+	fileLoggingEnabled := false
+	if len(cfg.Logger.LogDir) > 0 {
+		fileLoggingEnabled = true
+	}
+	if fileLoggingEnabled {
+		logsDir := cfg.Logger.LogDir
+		if err := os.MkdirAll(logsDir, 0744); err != nil {
+			fmt.Printf("can't create log directory, so file logging is disabled, error: %s", err.Error())
+		} else {
+			fileWriter := &lumberjack.Logger{
+				Filename:   path.Join(logsDir, "starling.log"),
+				MaxBackups: 3,  // files
+				MaxSize:    10, // megabytes
+				MaxAge:     30, // days
+			}
+
+			writers = append(writers, fileWriter)
+			//fmt.Printf("file logging is enabled, logsDir: %s\n", logsDir)
+		}
+	}
+	mw := io.MultiWriter(writers...)
+
+	log.Logger = zerolog.New(mw).With().Timestamp().Logger()
+	//log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05"})
 
 	switch strings.ToLower(cfg.Logger.LogLevel) {
 	case "panic":

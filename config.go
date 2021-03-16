@@ -9,6 +9,7 @@ import (
 type (
 	Config struct {
 		LogLevel string `yaml:"logLevel" json:"logLevel"` // logging level for the application
+		LogDir   string `yaml:"logDir" json:"logDir"`     // logging level for the application
 	}
 
 	config struct {
@@ -23,6 +24,7 @@ func newConfig() *config {
 	return &config{
 		Logger: Config{
 			LogLevel: "Debug",
+			LogDir:   "./log",
 		},
 		Data: storing.Config{
 			DataDirectory: "./",

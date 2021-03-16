@@ -19,7 +19,7 @@
           "en": "MsgGenTime"
         },
         "name": "MsgGenTime",
-        "schema": "datetime"
+        "schema": "dateTime"
       },
       {
         "@id": "dtmi:CoffeeCo:Brewer:StartBrew;1",

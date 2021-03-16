@@ -11,6 +11,8 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/go-uuid v1.0.2
 	github.com/magiconair/properties v1.8.4 // indirect
+	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/mightyguava/jl v0.1.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect
@@ -25,7 +27,7 @@ require (
 	github.com/spf13/viper v1.7.1
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
-	golang.org/x/sys v0.0.0-20210305230114-8fe3ee5dd75b // indirect
+	golang.org/x/sys v0.0.0-20210316164454-77fc1eacc6aa // indirect
 	golang.org/x/text v0.3.5 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0

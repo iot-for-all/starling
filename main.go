@@ -126,7 +126,7 @@ Data:
     dataDirectory: "."                  # Directory used for storing Simulation data.
 Logger:
     logLevel: debug				        # Logging level for the logger. Available logging levels are - panic, fatal, error, warn, info, debug, trace.
-
+    logsDir: "./logs"                   # Directory into which logs are written; logs are rotated automatically
 \n`)
 			return nil, err
 		}
@@ -151,11 +151,11 @@ func initLogger(cfg *config) {
 	writers = append(writers, zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05"})
 
 	fileLoggingEnabled := false
-	if len(cfg.Logger.LogDir) > 0 {
+	if len(cfg.Logger.LogsDir) > 0 {
 		fileLoggingEnabled = true
 	}
 	if fileLoggingEnabled {
-		logsDir := cfg.Logger.LogDir
+		logsDir := cfg.Logger.LogsDir
 		if err := os.MkdirAll(logsDir, 0744); err != nil {
 			fmt.Printf("can't create log directory, so file logging is disabled, error: %s", err.Error())
 		} else {

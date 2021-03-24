@@ -2,6 +2,7 @@ package serving
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/iot-for-all/starling/pkg/models"
 	"github.com/iot-for-all/starling/pkg/storing"
@@ -208,11 +209,13 @@ func deleteDevices(w http.ResponseWriter, r *http.Request) {
 
 	maxDeviceID := 0
 	if targetDevices != nil {
+		// format SimID-TargetID-modelID-NNNN
+		prefix := fmt.Sprintf("%s-%s-%s-", sim.ID, target.ID, modelID)
+		length := len(prefix)
 		for _, d := range targetDevices {
-			// format SimID-AppID-modelID-NNNN
-			tokens := strings.Split(d.DeviceID, "-")
-			if modelID == tokens[2] {
-				did, _ := strconv.Atoi(tokens[3])
+			if strings.Index(d.DeviceID, prefix) == 0 {
+				idStr := d.DeviceID[length:]
+				did, _ := strconv.Atoi(idStr)
 				if maxDeviceID < did {
 					maxDeviceID = did
 				}

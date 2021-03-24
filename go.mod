@@ -11,8 +11,6 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/go-uuid v1.0.2
 	github.com/magiconair/properties v1.8.4 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
-	github.com/mightyguava/jl v0.1.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect

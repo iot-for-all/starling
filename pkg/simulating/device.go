@@ -254,7 +254,7 @@ func (s *deviceSimulator) sendTelemetryMessage(msg *telemetryMessage, req *telem
 			iotdevice.WithSendCorrelationID(msg.correlationID),
 			iotdevice.WithSendMessageID(msg.messageID),
 			iotdevice.WithSendProperties(map[string]string{
-				"iothub-creation-time-utc":    msg.creationTimeUtc.Format(time.RFC3339),
+				"iothub-creation-time-utc":    msg.creationTimeUtc.Format("2006-01-02T15:04:05"),
 				"iothub-connection-device-id": msg.connectionDeviceID,
 				"iothub-interface-id":         msg.interfaceId,
 			}))

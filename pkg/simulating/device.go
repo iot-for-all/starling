@@ -23,23 +23,24 @@ import (
 type (
 	// device represents the IoT Central device being simulated.
 	device struct {
-		deviceID             string                   // unique id of the device.
-		model                *models.DeviceModel      // model of the device.
-		target               *models.SimulationTarget // target application of the device.
-		connectionString     string                   // IoT Hub connectionString of the device.
-		isConnected          bool                     // is the device connected.
-		isConnecting         bool                     // is the device connecting now.
-		telemetrySentTime    time.Time                // last time telemetry was sent from this device.
-		sendingTelemetry     bool                     // is the device sending telemetry now.
-		sendingReportedProps bool                     // is the device sending reported properties now.
-		iotHubClient         *iotdevice.Client        // IoT Hub connection MQTT client.
-		twinSub              *iotdevice.TwinStateSub  // subscription to listen for twin updates.
-		c2dSub               *iotdevice.EventSub      // subscription to listen for c2d commands
-		dataGenerator        *DataGenerator           // data generator used to generate telemetry and reported property updates.
-		retryCount           int                      // number of retries for sending telemetry
-		cancel               context.CancelFunc       // cancel function to invoke when the device is being disconnected.
-		context              context.Context          // the context of the device.
-		simulation           *models.Simulation       // the simulation that the device belongs to
+		deviceID                string                   // unique id of the device.
+		model                   *models.DeviceModel      // model of the device.
+		target                  *models.SimulationTarget // target application of the device.
+		connectionString        string                   // IoT Hub connectionString of the device.
+		isConnected             bool                     // is the device connected.
+		isConnecting            bool                     // is the device connecting now.
+		telemetrySentTime       time.Time                // last time telemetry was sent from this device.
+		sendingTelemetry        bool                     // is the device sending telemetry now.
+		sendingReportedProps    bool                     // is the device sending reported properties now.
+		iotHubClient            *iotdevice.Client        // IoT Hub connection MQTT client.
+		twinSub                 *iotdevice.TwinStateSub  // subscription to listen for twin updates.
+		c2dSub                  *iotdevice.EventSub      // subscription to listen for c2d commands
+		dataGenerator           *DataGenerator           // data generator used to generate telemetry and reported property updates.
+		retryCount              int                      // number of retries for sending telemetry
+		telemetrySequenceNumber int                      // monotonically increasing sequence number for telemetry
+		cancel                  context.CancelFunc       // cancel function to invoke when the device is being disconnected.
+		context                 context.Context          // the context of the device.
+		simulation              *models.Simulation       // the simulation that the device belongs to
 	}
 
 	// deviceCollection represents collection of devices used in device groups.
@@ -437,7 +438,9 @@ func (s *deviceSimulator) connectDevice(device *device) bool {
 				}
 
 				// close existing hub connections
-				_ = device.iotHubClient.Close()
+				if device.iotHubClient != nil {
+					_ = device.iotHubClient.Close()
+				}
 				device.iotHubClient = nil
 
 				hub = getHubName(device.connectionString)

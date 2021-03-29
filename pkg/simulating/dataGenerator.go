@@ -60,13 +60,14 @@ func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime ti
 		msgGuid, _ := uuid.GenerateUUID()
 		payload := make(map[string]interface{})
 		msgList := make([]map[string]interface{}, 1)
+		device.telemetrySequenceNumber++
 		msgList[0] = map[string]interface{}{
 			"DataSetWriterId": fmt.Sprintf("%s-%s", device.deviceID, msgGuid),
 			"MetaDataVersion": map[string]interface{}{
 				"MajorVersion": 1,
 				"MinorVersion": 0,
 			},
-			"SequenceNumber": rand.Intn(100000),
+			"SequenceNumber": device.telemetrySequenceNumber, //  rand.Intn(100000),
 			"Status":         nil,
 			"Timestamp":      d.getDateTime(),
 			"Payload":        payload,

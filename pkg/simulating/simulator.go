@@ -349,6 +349,7 @@ func (s *Simulator) distributeDeviceGroups() {
 				dataGenerator: &DataGenerator{
 					CapabilityModel: model.ParseDeviceCapabilityModel(),
 				},
+				telemetrySequenceNumber: 0,
 			}
 			s.deviceGroups[group].devices = append(s.deviceGroups[group].devices, &d)
 			devicesAdded++

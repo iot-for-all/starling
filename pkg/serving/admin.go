@@ -32,6 +32,7 @@ func StartAdmin(cfg *Config, ctrl *controlling.Controller) {
 	router.HandleFunc("/api/simulation/{id}/start", startSimulation).Methods(http.MethodPost)
 	router.HandleFunc("/api/simulation/{id}/stop", stopSimulation).Methods(http.MethodPost)
 	router.HandleFunc("/api/simulation/{id}/provision/{modelId}/{numDevices}", provisionDevices).Methods(http.MethodPost)
+	router.HandleFunc("/api/simulation/{id}/provision", deleteAllDevices).Methods(http.MethodDelete)
 	router.HandleFunc("/api/simulation/{id}/provision/{modelId}/{numDevices}", deleteDevices).Methods(http.MethodDelete)
 	router.HandleFunc("/api/simulation/{id}/deviceConfig", listDeviceConfigs).Methods(http.MethodGet)
 	router.HandleFunc("/api/simulation/{id}/deviceConfig", upsertDeviceConfig).Methods(http.MethodPut)

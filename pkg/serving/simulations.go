@@ -158,11 +158,13 @@ func provisionDevices(w http.ResponseWriter, r *http.Request) {
 
 	maxDeviceID := 0
 	if targetDevices != nil {
+		// format SimID-TargetID-modelID-NNNN
+		prefix := fmt.Sprintf("%s-%s-%s-", sim.ID, target.ID, modelID)
+		length := len(prefix)
 		for _, d := range targetDevices {
-			// format SimID-AppID-modelID-NNNN
-			tokens := strings.Split(d.DeviceID, "-")
-			if modelID == tokens[2] {
-				did, _ := strconv.Atoi(tokens[3])
+			if strings.Index(d.DeviceID, prefix) == 0 {
+				idStr := d.DeviceID[length:]
+				did, _ := strconv.Atoi(idStr)
 				if maxDeviceID < did {
 					maxDeviceID = did
 				}
@@ -171,6 +173,28 @@ func provisionDevices(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := controller.ProvisionDevices(r.Context(), sim, target, model, maxDeviceID, numDevices); err != nil {
+		if handleError(err, w) {
+			return
+		}
+	}
+}
+
+// deleteAllDevices deletes all the devices from the target and local cache
+func deleteAllDevices(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	simID := vars["id"]
+
+	sim, err := storing.Simulations.Get(simID)
+	if handleError(err, w) {
+		return
+	}
+
+	target, err := storing.Targets.Get(sim.TargetID)
+	if handleError(err, w) {
+		return
+	}
+
+	if err := controller.DeleteAllDevices(r.Context(), sim, target); err != nil {
 		if handleError(err, w) {
 			return
 		}

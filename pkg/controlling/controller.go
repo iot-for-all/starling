@@ -131,6 +131,49 @@ func (c *Controller) provisionDevice(simulation *models.Simulation, target *mode
 	//log.Debug().Str("deviceId", req.DeviceID).Msg("saved device in cache")
 }
 
+func (c *Controller) DeleteAllDevices(ctx context.Context, sim *models.Simulation, target *models.SimulationTarget) error {
+	targetDevices, err := storing.TargetDevices.ListByTargetIdSimId(target.ID, sim.ID)
+	if err != nil {
+		return err
+	}
+
+	wg := sync.WaitGroup{}
+
+	numDevices := len(targetDevices)
+	for i, td := range targetDevices {
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+
+			wg.Add(1)
+			go c.deleteDevice(ctx, target, td.DeviceID, &wg)
+
+			// throttle API calls to Central
+			if i%c.simulationCfg.MaxConcurrentDeletes == 0 {
+				wg.Wait()
+			}
+
+			if i%10 == 0 {
+				log.Debug().
+					Int("deleted", i+1).
+					Int("remaining", numDevices-i-1).
+					Str("simId", sim.ID).
+					Msg("deleting devices in progress")
+			}
+		}
+	}
+	wg.Wait()
+
+	log.Debug().
+		Int("deleted", numDevices).
+		Str("simId", sim.ID).
+		Msg("deleting devices completed")
+
+	return nil
+
+}
+
 // DeleteDevices deletes devices in a target based on the deviceConfig.
 func (c *Controller) DeleteDevices(ctx context.Context, simulation *models.Simulation, target *models.SimulationTarget, model *models.DeviceModel, maxDeviceID int, numDevices int) error {
 	wg := sync.WaitGroup{}
@@ -156,7 +199,7 @@ func (c *Controller) DeleteDevices(ctx context.Context, simulation *models.Simul
 
 			if i%10 == 0 {
 				log.Debug().
-					Int("deleted", i).
+					Int("deleted", i+1).
 					Int("remaining", numDevices-i-1).
 					Str("modelID", model.ID).
 					Msg("deleting devices in progress")

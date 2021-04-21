@@ -234,12 +234,12 @@ func (d *DataGenerator) getBool() bool {
 
 // getDate gets the current date as a string.
 func (d *DataGenerator) getDate() string {
-	return time.Now().Format("2006-01-02")
+	return time.Now().UTC().Format("2006-01-02")
 }
 
 // getDateTime gets current date time as a string.
 func (d *DataGenerator) getDateTime() string {
-	return time.Now().Format(time.RFC3339)
+	return time.Now().UTC().Format(time.RFC3339)
 }
 
 // getDouble gets a random double.

@@ -90,8 +90,8 @@ func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime ti
 				telemetryName := telemetry.Name
 				telemetryValue := d.getRandomValue(telemetry.Schema)
 				payload[opcuaNodeId] = map[string]interface{}{
-					"ServerTimestamp": time.Now(),
-					"SourceTimestamp": time.Now(),
+					"ServerTimestamp": time.Now().UTC(),
+					"SourceTimestamp": time.Now().UTC(),
 					"StatusCode":      nil,
 					//"Name":            telemetryName,
 					"Value": telemetryValue,
@@ -295,5 +295,5 @@ func (d *DataGenerator) getString(length int) string {
 
 //getTime gets the current time as string.
 func (d *DataGenerator) getTime() string {
-	return time.Now().Format(time.RFC3339)
+	return time.Now().UTC().Format(time.RFC3339)
 }

@@ -320,8 +320,8 @@ func (s *deviceSimulator) sendReportedProps(req *reportedPropsRequest) {
 		log.Debug().Err(err).Str("deviceID", req.device.deviceID).Msg("error sending reported properties update")
 		req.device.retryCount++
 	} else {
-		now := time.Now()
-		latency := float64(now.UnixNano()-start.UnixNano()) / float64(time.Second)
+		end := time.Now()
+		latency := float64(end.UnixNano()-start.UnixNano()) / float64(time.Second)
 		reportedPropsSuccessTotal.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Add(1)
 		reportedPropsSendLatency.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Observe(latency)
 		log.Trace().
@@ -657,7 +657,7 @@ func (s *deviceSimulator) unsubscribeCommands(device *device) bool {
 
 // getNextTelemetryBatch creates a batch of telemetry messages evenly distributed since last time telemetry was sent
 func (s *deviceSimulator) getNextTelemetryBatch(device *device) *telemetryBatch {
-	now := time.Now()
+	now := time.Now().UTC()
 	batchSize := s.simulation.TelemetryBatchSize
 	var batch telemetryBatch
 

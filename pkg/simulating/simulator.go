@@ -152,6 +152,7 @@ func (s *Simulator) startTelemetryRequestPump() {
 						Int("waveGroup", waveGroup).
 						Int("numDevices", len(devs.devices)).
 						Int("numGoroutines", runtime.NumGoroutine()).
+						Str("simId", s.simulation.ID).
 						Msg("sending telemetry requests")
 
 					// send telemetry for all devices in the group
@@ -170,6 +171,7 @@ func (s *Simulator) startTelemetryRequestPump() {
 						Int("waveGroup", waveGroup).
 						Int("numDevices", len(devs.devices)).
 						Int("numGoroutines", runtime.NumGoroutine()).
+						Str("simId", s.simulation.ID).
 						Msg("sent telemetry requests")
 
 					// sleep for some time between each device group
@@ -220,6 +222,7 @@ func (s *Simulator) startReportedPropertyRequestPump() {
 						Int("waveGroup", waveGroup).
 						Int("numDevices", len(devs.devices)).
 						Int("numGoroutines", runtime.NumGoroutine()).
+						Str("simId", s.simulation.ID).
 						Msg("sending reported properties requests")
 
 					for _, dev := range devs.devices {
@@ -237,6 +240,7 @@ func (s *Simulator) startReportedPropertyRequestPump() {
 						Int("waveGroup", waveGroup).
 						Int("numDevices", len(devs.devices)).
 						Int("numGoroutines", runtime.NumGoroutine()).
+						Str("simId", s.simulation.ID).
 						Msg("sent reported properties requests")
 
 					// sleep for some time between each device group

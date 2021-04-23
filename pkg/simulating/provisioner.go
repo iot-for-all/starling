@@ -128,8 +128,8 @@ func (p *DeviceProvisioner) Provision(req *ProvisioningRequest) *ProvisioningRes
 		req.DeviceID,
 		key)
 
-	now := time.Now()
-	latency := float64(now.UnixNano()-start.UnixNano()) / float64(time.Second)
+	end := time.Now()
+	latency := float64(end.UnixNano()-start.UnixNano()) / float64(time.Second)
 
 	provisionLatency.WithLabelValues(req.Simulation.ID, req.Simulation.TargetID, req.Model.ID).Observe(latency)
 	provisionSuccessTotal.WithLabelValues(req.Simulation.ID, req.Simulation.TargetID, req.Model.ID).Add(1)
@@ -164,12 +164,12 @@ func (p *DeviceProvisioner) sendRegisterRequest(
 		},
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error creating device registration object (%s)", err.Error())
 	}
 
 	req, err := http.NewRequestWithContext(p.context, "PUT", path, bytes.NewReader(reqData))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error creating device registration request to DPS (%s)", err.Error())
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -178,13 +178,13 @@ func (p *DeviceProvisioner) sendRegisterRequest(
 
 	res, err := p.client.Do(req)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error sending device registration request to DPS (%s)", err.Error())
 	}
 
 	var resData registrationResponse
 	err = json.NewDecoder(res.Body).Decode(&resData)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error parsing device registration response from DPS (%s)", err.Error())
 	}
 
 	return resData.OperationID, nil

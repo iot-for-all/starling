@@ -54,14 +54,7 @@ func upsertDeviceModel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = storing.DeviceModels.Set(&model)
-	if handleError(err, w) {
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(&model)
-	handleError(err, w)
+	upsertDeviceModelInternal(w, r, model)
 }
 
 // deleteDeviceModel deletes an existing device model.
@@ -69,5 +62,16 @@ func deleteDeviceModel(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	err := storing.DeviceModels.Delete(id)
+	handleError(err, w)
+}
+
+func upsertDeviceModelInternal(w http.ResponseWriter, r *http.Request, model models.DeviceModel) {
+	err := storing.DeviceModels.Set(&model)
+	if handleError(err, w) {
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(&model)
 	handleError(err, w)
 }

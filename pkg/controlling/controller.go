@@ -3,6 +3,7 @@ package controlling
 import (
 	"context"
 	"fmt"
+	"github.com/iot-for-all/starling/pkg/config"
 	"github.com/iot-for-all/starling/pkg/models"
 	"github.com/iot-for-all/starling/pkg/simulating"
 	"github.com/iot-for-all/starling/pkg/storing"
@@ -14,13 +15,13 @@ import (
 
 // Controller responsible for starting and stopping simulations; provisioning and deleting devices from a target application.
 type Controller struct {
-	context       context.Context    // parent program context.
-	simulationCfg *simulating.Config // simulator configuration.
+	context       context.Context          // parent program context.
+	simulationCfg *config.SimulationConfig // simulator configuration.
 	simulations   map[string]*simulating.Simulator
 }
 
 // NewController creates a new controller.
-func NewController(context context.Context, simulatorCfg *simulating.Config) *Controller {
+func NewController(context context.Context, simulatorCfg *config.SimulationConfig) *Controller {
 	return &Controller{
 		context:       context,
 		simulationCfg: simulatorCfg,
@@ -220,7 +221,7 @@ func (c *Controller) DeleteDevices(ctx context.Context, simulation *models.Simul
 func (c *Controller) deleteDevice(ctx context.Context, target *models.SimulationTarget, deviceID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	path := fmt.Sprintf("https://%s/api/preview/devices/%s", target.AppUrl, deviceID)
+	path := fmt.Sprintf("https://%s/api/devices/%s?api-version=1.0", target.AppUrl, deviceID)
 	req, err := http.NewRequestWithContext(ctx, "DELETE", path, nil)
 	if err != nil {
 		log.Err(err).Str("deviceID", deviceID).Msg("error creating deprovision request")
@@ -240,6 +241,8 @@ func (c *Controller) deleteDevice(ctx context.Context, target *models.Simulation
 	// user might want to delete devices from Central that might not exist in client side case
 	// ignore errors
 	_ = storing.TargetDevices.Delete(target.ID, deviceID)
+
+	log.Trace().Str("deviceID", deviceID).Str("path", path).Msg("deleted device")
 }
 
 // ResetSimulationStatus resets all simulation status to stopped
@@ -250,11 +253,22 @@ func (c *Controller) ResetSimulationStatus() error {
 	}
 
 	for _, sim := range sims {
-		sim.Status = models.SimulationStatusStopped
+		sim.Status = models.SimulationStatusReady
+		sim.LastUpdatedTime = time.Now()
 		err := storing.Simulations.Set(&sim)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// GetConnectedDeviceCount returns the number of devices connected for the given simulation and model
+func (c *Controller) GetConnectedDeviceCount(simulation *models.Simulation, modelId string) int {
+	sim, ok := c.simulations[simulation.ID]
+	if !ok {
+		return 0
+	}
+
+	return sim.GetConnectedDeviceCount(modelId)
 }

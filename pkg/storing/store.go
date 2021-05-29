@@ -3,6 +3,7 @@ package storing
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/iot-for-all/starling/pkg/config"
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/rs/zerolog/log"
@@ -23,7 +24,7 @@ type store struct {
 }
 
 // Open initializes and opens the database
-func Open(cfg *Config) error {
+func Open(cfg *config.StoreConfig) error {
 	// TODO: Open with correct badger options
 	dbFile := fmt.Sprintf("%s/.db", cfg.DataDirectory)
 	opts := badger.DefaultOptions(dbFile)
@@ -94,7 +95,7 @@ func (s *store) list(prefix []byte, handler func(key []byte, val []byte) error) 
 			})
 
 			if err != nil {
-				return fmt.Errorf("failure reading items for key %s", prefix)
+				return fmt.Errorf("failure reading items for key %s, %w", prefix, err)
 			}
 		}
 

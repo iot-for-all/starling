@@ -107,7 +107,11 @@ func upsertTarget(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = storing.Targets.Set(&t)
+	upsertTargetInternal(w, r, t)
+}
+
+func upsertTargetInternal(w http.ResponseWriter, r *http.Request, t models.SimulationTarget) {
+	err := storing.Targets.Set(&t)
 	if handleError(err, w) {
 		return
 	}

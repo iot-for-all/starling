@@ -1,0 +1,32 @@
+.form-help {
+  display: inline-flex;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  font-size: 0.75rem;
+  color: #656d77;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background: rgba(135, 142, 151, 0.1);
+  border-radius: 100rem;
+  transition: 0.3s background-color, 0.3s color;
+}
+
+.tippy-tooltip {
+  background-color: #dbeef5;
+  border-radius: 25px;
+  color: black;
+}
+
+.helpButtonTooltip {
+    width: 350px;
+    font-size: 0.8rem;
+    text-transform: none;
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/iot-for-all/starling/pkg/config"
 	"reflect"
 	"runtime"
 	"strings"
@@ -53,7 +54,7 @@ type (
 		cancel                context.CancelFunc         // cancel function to invoke when the device simulator is being stopped.
 		context               context.Context            // the context of the device simulator.
 		simulation            *models.Simulation         // the simulation that is driving this simulator.
-		config                *Config                    // starling level simulation configuration.
+		config                *config.SimulationConfig   // starling level simulation configuration.
 		telemetryRequests     chan *telemetryRequest     // input channel used for queuing up telemetry requests.
 		reportedPropsRequests chan *reportedPropsRequest // input channel used for queuing up reported property requests.
 		provisioner           *DeviceProvisioner         // provisioner to provision devices using DPS
@@ -98,7 +99,7 @@ var (
 )
 
 // newDeviceSimulator create a new device simulator
-func newDeviceSimulator(ctx context.Context, config *Config, simulation *models.Simulation) *deviceSimulator {
+func newDeviceSimulator(ctx context.Context, config *config.SimulationConfig, simulation *models.Simulation) *deviceSimulator {
 	deviceSimContext, cancel := context.WithCancel(ctx)
 	return &deviceSimulator{
 		cancel:                cancel,
@@ -243,40 +244,48 @@ func (s *deviceSimulator) sendTelemetry(req *telemetryRequest) {
 func (s *deviceSimulator) sendTelemetryMessage(msg *telemetryMessage, req *telemetryRequest, wg *sync.WaitGroup) bool {
 	defer wg.Done()
 
-	start := time.Now()
-	var err error
-	if useMock {
-		randSleep(req.device.context, 500, 5000)
-	} else {
-		// send telemetry to IoT Central
-		log.Trace().Str("payload", string(msg.body)).Int("size", len(msg.body)).Msg("about to send telemetry message")
-		timeoutCtx, _ := context.WithTimeout(req.device.context, time.Millisecond*time.Duration(s.config.TelemetryTimeout))
-		err = req.device.iotHubClient.SendEvent(timeoutCtx, msg.body,
-			iotdevice.WithSendCorrelationID(msg.correlationID),
-			iotdevice.WithSendMessageID(msg.messageID),
-			iotdevice.WithSendProperties(map[string]string{
-				"iothub-creation-time-utc":    msg.creationTimeUtc.Format("2006-01-02T15:04:05"),
-				"iothub-connection-device-id": msg.connectionDeviceID,
-				"iothub-interface-id":         msg.interfaceId,
-			}))
+	// try to send telemetry couple of times before giving up
+	sentMessage := false
+	for i := 0; i < 2; i++ {
+		start := time.Now()
+		var err error
+		if useMock {
+			randSleep(req.device.context, 500, 5000)
+		} else {
+			// send telemetry to IoT Central
+			log.Trace().Str("payload", string(msg.body)).Int("size", len(msg.body)).Msg("about to send telemetry message")
+			timeoutCtx, _ := context.WithTimeout(req.device.context, time.Millisecond*time.Duration(s.config.TelemetryTimeout))
+			err = req.device.iotHubClient.SendEvent(timeoutCtx, msg.body,
+				iotdevice.WithSendCorrelationID(msg.correlationID),
+				iotdevice.WithSendMessageID(msg.messageID),
+				iotdevice.WithSendProperties(map[string]string{
+					"iothub-creation-time-utc":    msg.creationTimeUtc.Format("2006-01-02T15:04:05"),
+					"iothub-connection-device-id": msg.connectionDeviceID,
+					"iothub-interface-id":         msg.interfaceId,
+				}))
+		}
+		if err != nil {
+			log.Error().
+				Str("deviceID", req.device.deviceID).
+				Err(err).
+				Msg("error sending telemetry to hub")
+			telemetryMessageFailureTotal.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID, s.getErrorType(err)).Add(1)
+			req.device.retryCount++
+		} else {
+			req.device.retryCount = 0
+			telemetryMessageSuccessTotal.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Add(1)
+			latency := float64(time.Now().UnixNano()-start.UnixNano()) / float64(time.Second)
+			telemetryMessageSendLatency.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Observe(latency)
+			telemetrySentBytes.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Add(float64(len(msg.body)))
+			telemetryDataPointsSentTotal.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Add(float64(msg.dataPointCount))
+			sentMessage = true
+			break
+		}
+
+		// sleep for sometime before retrying to send telemetry
+		sleep(req.device.context, time.Second*15)
 	}
-	if err != nil {
-		log.Error().
-			Str("deviceID", req.device.deviceID).
-			Err(err).
-			Msg("error sending telemetry to hub")
-		telemetryMessageFailureTotal.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID, s.getErrorType(err)).Add(1)
-		req.device.retryCount++
-		return false
-	} else {
-		req.device.retryCount = 0
-		telemetryMessageSuccessTotal.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Add(1)
-		latency := float64(time.Now().UnixNano()-start.UnixNano()) / float64(time.Second)
-		telemetryMessageSendLatency.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Observe(latency)
-		telemetrySentBytes.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Add(float64(len(msg.body)))
-		telemetryDataPointsSentTotal.WithLabelValues(s.simulation.ID, s.simulation.TargetID, req.device.model.ID).Add(float64(msg.dataPointCount))
-	}
-	return true
+	return sentMessage
 }
 
 // sendReportedProps send reported properties update from the device
@@ -481,7 +490,7 @@ func (s *deviceSimulator) connectDevice(device *device) bool {
 	device.isConnected = true
 	device.isConnecting = false
 	connectedDeviceGauge.WithLabelValues(s.simulation.ID, s.simulation.TargetID, device.model.ID, hub).Inc()
-
+	connectedDeviceByModelGauge.WithLabelValues(s.simulation.ID, s.simulation.TargetID, device.model.ID).Inc()
 	return true
 }
 
@@ -510,7 +519,6 @@ func (s *deviceSimulator) disconnectDevice(device *device) bool {
 			_ = device.iotHubClient.Close()
 			device.iotHubClient = nil
 			device.context, device.cancel = context.WithCancel(s.context)
-
 		}
 	}
 	log.Trace().Str("deviceID", device.deviceID).Msg("disconnected device from IoT Hub")
@@ -520,6 +528,7 @@ func (s *deviceSimulator) disconnectDevice(device *device) bool {
 
 	if device.isConnected {
 		connectedDeviceGauge.WithLabelValues(s.simulation.ID, s.simulation.TargetID, device.model.ID, hub).Dec()
+		connectedDeviceByModelGauge.WithLabelValues(s.simulation.ID, s.simulation.TargetID, device.model.ID).Dec()
 	}
 	device.isConnected = false
 

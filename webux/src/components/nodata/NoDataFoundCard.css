@@ -1,0 +1,14 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 1rem;
+  text-align: center;
+}
+
+.empty-image {
+    width: 16.75rem;
+    height: 17.25rem;
+}

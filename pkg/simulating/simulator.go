@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/iot-for-all/starling/pkg/config"
 	"github.com/rs/zerolog/log"
 	"math/rand"
 	"runtime"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/iot-for-all/starling/pkg/models"
 	"github.com/iot-for-all/starling/pkg/storing"
+	dto "github.com/prometheus/client_model/go"
 )
 
 type (
@@ -21,7 +23,7 @@ type (
 		// the context of the simulator
 		context context.Context
 		// simulator configuration
-		config *Config
+		config *config.SimulationConfig
 		// the simulation to execute
 		simulation *models.Simulation
 		// the target to execute the simulation at
@@ -42,7 +44,7 @@ type (
 // Start starts the simulation.
 func Start(
 	ctx context.Context,
-	config *Config,
+	config *config.SimulationConfig,
 	simulation *models.Simulation) (*Simulator, error) {
 
 	target, err := storing.Targets.Get(simulation.TargetID)
@@ -96,7 +98,7 @@ func Start(
 // start starts the simulation pumps
 func (s *Simulator) start() {
 	// update the status of simulation
-	if err := updateSimulationStatus(s.simulation, models.SimulationStatusStarting); err != nil {
+	if err := updateSimulationStatus(s.simulation, models.SimulationStatusRunning); err != nil {
 		log.Error().Err(err).Msg("error updating simulation status")
 	}
 
@@ -270,9 +272,9 @@ func (s *Simulator) Stop() error {
 	log.Trace().
 		Str("simID", s.simulation.ID).
 		Msg("stopping simulation")
-	if err := updateSimulationStatus(s.simulation, models.SimulationStatusStopping); err != nil {
-		return err
-	}
+	//if err := updateSimulationStatus(s.simulation, models.SimulationStatusStopping); err != nil {
+	//	return err
+	//}
 
 	s.cancel() // send cancellation signal to all go funcs.
 
@@ -286,7 +288,7 @@ func (s *Simulator) Stop() error {
 	}
 
 	// update the status of simulation
-	if err := updateSimulationStatus(s.simulation, models.SimulationStatusStopped); err != nil {
+	if err := updateSimulationStatus(s.simulation, models.SimulationStatusReady); err != nil {
 		return err
 	}
 
@@ -295,6 +297,16 @@ func (s *Simulator) Stop() error {
 		Msg("simulation stopped")
 
 	return nil
+}
+
+func (s *Simulator) GetConnectedDeviceCount(modelId string) int {
+	var m = &dto.Metric{}
+	if err := connectedDeviceByModelGauge.WithLabelValues(s.simulation.ID, s.simulation.TargetID, modelId).Write(m); err != nil {
+		log.Error().Err(err).Msg("error getting connected devices metric value")
+		return 0
+	}
+
+	return int(m.Gauge.GetValue())
 }
 
 // distributeDeviceGroups divides the devices in the simulation into wave groups
@@ -334,25 +346,23 @@ func (s *Simulator) distributeDeviceGroups() {
 
 			deviceContext, deviceCancel := context.WithCancel(s.context)
 			d := device{
-				deviceID:             deviceID,
-				model:                model,
-				target:               s.target,
-				connectionString:     "",
-				isConnected:          false,
-				isConnecting:         false,
-				telemetrySentTime:    time.Time{},
-				sendingTelemetry:     false,
-				sendingReportedProps: false,
-				iotHubClient:         nil,
-				twinSub:              nil,
-				c2dSub:               nil,
-				retryCount:           0,
-				cancel:               deviceCancel,
-				context:              deviceContext,
-				simulation:           s.simulation,
-				dataGenerator: &DataGenerator{
-					CapabilityModel: model.ParseDeviceCapabilityModel(),
-				},
+				deviceID:                deviceID,
+				model:                   model,
+				target:                  s.target,
+				connectionString:        "",
+				isConnected:             false,
+				isConnecting:            false,
+				telemetrySentTime:       time.Time{},
+				sendingTelemetry:        false,
+				sendingReportedProps:    false,
+				iotHubClient:            nil,
+				twinSub:                 nil,
+				c2dSub:                  nil,
+				retryCount:              0,
+				cancel:                  deviceCancel,
+				context:                 deviceContext,
+				simulation:              s.simulation,
+				dataGenerator:           NewDataGenerator(model.ParseDeviceCapabilityModel(), s.config.GeopointData),
 				telemetrySequenceNumber: 0,
 			}
 			s.deviceGroups[group].devices = append(s.deviceGroups[group].devices, &d)
@@ -378,6 +388,8 @@ func randSleep(ctx context.Context, minMs int, maxMs int) {
 func updateSimulationStatus(simulation *models.Simulation, status models.SimulationStatus) error {
 	// update the status of simulation
 	simulation.Status = status
+	simulation.LastUpdatedTime = time.Now()
+
 	err := storing.Simulations.Set(simulation)
 	return err
 }

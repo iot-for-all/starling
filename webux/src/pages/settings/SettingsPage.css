@@ -1,0 +1,13 @@
+.geopointData {
+    font-family: Consolas, Lucida Console, monospace;
+    line-height: 1.2rem;
+  }
+  
+  ol.helpButton {
+    margin-left: 5px;
+    margin-top: 5px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }

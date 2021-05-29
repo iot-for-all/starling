@@ -1,0 +1,26 @@
+.tableToolbar {
+    display: flex;
+    background-color: #fff;
+    border-top: 1px solid rgba(0, 40, 100, 0.12);
+    border-left: 1px solid rgba(0, 40, 100, 0.12);
+    border-right: 1px solid rgba(0, 40, 100, 0.12);
+    border-radius: 3px;
+    padding: 5px;
+    align-items: center;
+}
+
+.tableToolbarButtons {
+    width: 500px;
+    min-width: 50px;
+    margin: 5px;
+    flex: 1 0 0;
+}
+
+.tableToolbarStatus {
+    width: 100px;
+    min-width: 100px;
+    margin: 5px;
+    flex: 1 0 0;
+    text-align: right;
+    font-size: 0.85rem;
+}

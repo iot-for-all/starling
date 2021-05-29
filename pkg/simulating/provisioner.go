@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/iot-for-all/starling/pkg/config"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
@@ -32,9 +33,9 @@ type (
 
 	// DeviceProvisioner responsible for provisioning devices via DPS.
 	DeviceProvisioner struct {
-		context context.Context // the context of the provisioner.
-		config  *Config         // starling configuration.
-		client  *http.Client    // http client used to interact with DPS
+		context context.Context          // the context of the provisioner.
+		config  *config.SimulationConfig // starling configuration.
+		client  *http.Client             // http client used to interact with DPS
 	}
 
 	// registrationRequest is the registration request sent to DPS
@@ -60,7 +61,7 @@ type (
 )
 
 // NewProvisioner creates a new deviceProvisioner.
-func NewProvisioner(ctx context.Context, cfg *Config) *DeviceProvisioner {
+func NewProvisioner(ctx context.Context, cfg *config.SimulationConfig) *DeviceProvisioner {
 	p := DeviceProvisioner{
 		context: ctx,
 		config:  cfg,

@@ -3,21 +3,22 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
-	"os/signal"
-	"path"
-	"strings"
-
+	"github.com/iot-for-all/starling/pkg/config"
 	"github.com/iot-for-all/starling/pkg/controlling"
 	"github.com/iot-for-all/starling/pkg/serving"
 	"github.com/iot-for-all/starling/pkg/storing"
-	"github.com/mitchellh/go-homedir"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	flag "github.com/spf13/pflag"
-	"github.com/spf13/viper"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/yaml.v3"
+	"io"
+	"os"
+	"os/exec"
+	"os/signal"
+	"path"
+	"path/filepath"
+	"runtime"
+	"strings"
 )
 
 func main() {
@@ -49,9 +50,16 @@ func main() {
 	controller := controlling.NewController(ctx, &cfg.Simulation)
 	controller.ResetSimulationStatus()
 
-	// StartSimulation the admin and metrics http endpoints
-	go serving.StartAdmin(&cfg.HTTP, controller)
+	// Start the admin and metrics http endpoints
+	go serving.StartAdmin(cfg, controller)
 	go serving.StartMetrics(&cfg.HTTP)
+
+	// open web browser serving the Starling website
+	url := fmt.Sprintf("http://localhost:%d", cfg.HTTP.AdminPort)
+	err = openWebBrowser(url)
+	if err != nil {
+		log.Error().Err(err).Msg(fmt.Sprintf("failed to open web browser with url %s", url))
+	}
 
 	// Wait signal / cancellation
 	<-sig
@@ -61,7 +69,7 @@ func main() {
 }
 
 // loadConfig loads the configuration file
-func loadConfig() (*config, error) {
+func loadConfig() (*config.GlobalConfig, error) {
 	colorReset := "\033[0m"
 	//colorRed := "\033[31m"
 	colorGreen := "\033[32m"
@@ -83,70 +91,42 @@ func loadConfig() (*config, error) {
 	fmt.Printf("     IOT CENTRAL DEVICE SIMULATOR\n")
 	fmt.Printf(string(colorReset))
 
-	home, err := homedir.Dir()
+	cfg := config.NewConfig()
+
+	// if the config file does not exist, write a default config file
+	exeDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		return nil, err
+		fmt.Printf("error reading current directory: %s\n", err)
 	}
-
-	cfgFile := flag.StringP("config", "c", "", "Configuration file to load")
-	flag.Parse()
-
-	if *cfgFile != "" {
-		viper.SetConfigFile(*cfgFile)
-	} else {
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".starling.yaml")
-		viper.SetConfigType("yml")
-	}
-
-	viper.AutomaticEnv()
-	if err = viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			fmt.Print(`Add a configuration file ($HOME/.starling.yaml) with the file contents below:
-
-HTTP:
-    adminPort: 6001                     # Port number of the administrative service.
-    metricsPort: 6002                   # Port number for Prometheus service to scrape.
-Simulation:
-    connectionTimeout: 30000            # Connection timeout in milli seconds.
-    telemetryTimeout: 30000             # Telemetry send timeout in milli seconds.
-    twinUpdateTimeout: 30000            # Twin update timeout in milli seconds.
-    commandTimeout: 30000               # Command ack timeout in milli seconds.
-    registrationAttemptTimeout: 30000   # Device registration timeout in milli seconds.
-    maxConcurrentConnections: 100       # Maximum number of concurrent connections to send telemetry per simulation.
-    maxConcurrentTwinUpdates: 10        # Maximum number of concurrent twin updates per simulation.
-    maxConcurrentRegistrations: 10      # Maximum number of concurrent device registrations (DPS calls).
-    maxConcurrentDeletes: 10            # Maximum number of concurrent device deletes.
-    maxRegistrationAttempts: 10         # Maximum number of device registration attempts.
-    enableTelemetry: true               # Enable device telemetry sends across all simulations.
-    enableReportedProps: true           # Enable device reported property sends across all simulations.
-    enableTwinUpdateAcks: true          # Enable device twin (desired property) update acknowledgement across all simulations.
-    enableCommandAcks: true             # Enable device command (direct method, C2D) acknowledgement across all simulations.
-Data:
-    dataDirectory: "."                  # Directory used for storing Simulation data.
-Logger:
-    logLevel: debug				        # Logging level for the logger. Available logging levels are - panic, fatal, error, warn, info, debug, trace.
-    logsDir: "./logs"                   # Directory into which logs are written; logs are rotated automatically
-\n`)
-			return nil, err
+	configFileName := path.Join(exeDir, "starling.yaml")
+	if _, err := os.Stat(configFileName); os.IsNotExist(err) {
+		content, err := yaml.Marshal(cfg)
+		if err != nil {
+			fmt.Printf("error reading current directory: %s\n", err)
+		} else {
+			err = os.WriteFile(configFileName, content, os.ModePerm)
+			if err != nil {
+				fmt.Printf("error writing to default config file %s: %s\n", configFileName, err)
+			}
 		}
 	}
 
-	cfg := newConfig()
-	if err = viper.Unmarshal(cfg); err != nil {
-		return nil, err
+	// read the config file
+	content, err := os.ReadFile(configFileName)
+	err = yaml.Unmarshal(content, &cfg)
+	if err != nil {
+		fmt.Printf("error reading config file %s: %s", configFileName, err)
 	}
 
 	if cfg.Data.DataDirectory == "" {
-		cfg.Data.DataDirectory = fmt.Sprintf("%s/.starling", home)
+		cfg.Data.DataDirectory = fmt.Sprintf("%s/data", exeDir)
 	}
 
-	//fmt.Printf("loaded configuration from %s\n", viper.ConfigFileUsed())
 	return cfg, nil
 }
 
 // initLogger initializes the logger with output format
-func initLogger(cfg *config) {
+func initLogger(cfg *config.GlobalConfig) {
 	var writers []io.Writer
 	writers = append(writers, zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05"})
 
@@ -191,4 +171,22 @@ func initLogger(cfg *config) {
 	default:
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
+}
+
+// openWebBrowser opens the specified URL in the default browser of the user.
+func openWebBrowser(url string) error {
+	var cmd string
+	var args []string
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd = "cmd"
+		args = []string{"/c", "start"}
+	case "darwin":
+		cmd = "open"
+	default: // "linux", "freebsd", "openbsd", "netbsd"
+		cmd = "xdg-open"
+	}
+	args = append(args, url)
+	return exec.Command(cmd, args...).Start()
 }

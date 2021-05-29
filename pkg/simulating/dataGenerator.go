@@ -17,34 +17,45 @@ type (
 	DataGenerator struct {
 		CapabilityModel *models.DeviceCapabilityModel // the capability model of the device.
 		nextGeoPoint    int                           // geo point to be used next from the geopointRoute
+		geopointRoute   [][3]float64                  // data to be used for generating geopoint data type
 	}
 )
 
-var (
-	geopointRoute = [][2]float64{
-		{47.645804, -122.132337},
-		{47.644799, -122.132291},
-		{47.643975, -122.132302},
-		{47.642746, -122.132366},
-		{47.641264, -122.132409},
-		{47.639768, -122.132430},
-		{47.637844, -122.132393},
-		{47.635111, -122.132479},
-		{47.633202, -122.132382},
-		{47.633354, -122.131191},
-		{47.634540, -122.129163},
-		{47.636325, -122.126081},
-		{47.638046, -122.123120},
-		{47.641111, -122.119204},
-		{47.644017, -122.115642},
-		{47.645990, -122.114258},
-		{47.646069, -122.117938},
-		{47.646069, -122.120921},
-		{47.646105, -122.125888},
-		{47.646047, -122.129568},
-		{47.646069, -122.132164},
+func NewDataGenerator(capabilityModel *models.DeviceCapabilityModel, geopoints [][3]float64) *DataGenerator {
+	defaultGeopointRoute := [][3]float64{
+		{47.645804, -122.132337, 0.0},
+		{47.644799, -122.132291, 0.0},
+		{47.643975, -122.132302, 0.0},
+		{47.642746, -122.132366, 0.0},
+		{47.641264, -122.132409, 0.0},
+		{47.639768, -122.132430, 0.0},
+		{47.637844, -122.132393, 0.0},
+		{47.635111, -122.132479, 0.0},
+		{47.633202, -122.132382, 0.0},
+		{47.633354, -122.131191, 0.0},
+		{47.634540, -122.129163, 0.0},
+		{47.636325, -122.126081, 0.0},
+		{47.638046, -122.123120, 0.0},
+		{47.641111, -122.119204, 0.0},
+		{47.644017, -122.115642, 0.0},
+		{47.645990, -122.114258, 0.0},
+		{47.646069, -122.117938, 0.0},
+		{47.646069, -122.120921, 0.0},
+		{47.646105, -122.125888, 0.0},
+		{47.646047, -122.129568, 0.0},
+		{47.646069, -122.132164, 0.0},
 	}
-)
+	geopointRoute := geopoints
+	if len(geopointRoute) == 0 {
+		geopointRoute = defaultGeopointRoute
+	}
+
+	return &DataGenerator{
+		CapabilityModel: capabilityModel,
+		nextGeoPoint:    0,
+		geopointRoute:   geopointRoute,
+	}
+}
 
 // GenerateTelemetryMessage generate a telemetry messages based on the device capability model.
 func (d *DataGenerator) GenerateTelemetryMessage(device *device, creationTime time.Time) ([]*telemetryMessage, error) {
@@ -264,11 +275,11 @@ func (d *DataGenerator) getFloat() float32 {
 
 // getInt gets a a geopoint along a predefined route in Redmond.
 func (d *DataGenerator) getGeopoint() map[string]interface{} {
-	d.nextGeoPoint = (d.nextGeoPoint + 1) % len(geopointRoute)
+	d.nextGeoPoint = (d.nextGeoPoint + 1) % len(d.geopointRoute)
 	return map[string]interface{}{
-		"lat": geopointRoute[d.nextGeoPoint][0],
-		"lon": geopointRoute[d.nextGeoPoint][1],
-		"alt": 0,
+		"lat": d.geopointRoute[d.nextGeoPoint][0],
+		"lon": d.geopointRoute[d.nextGeoPoint][1],
+		"alt": d.geopointRoute[d.nextGeoPoint][2],
 	}
 }
 

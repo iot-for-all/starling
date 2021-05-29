@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/iot-for-all/starling/pkg/models"
+	"github.com/rs/zerolog/log"
 )
 
 type simulations struct {
@@ -21,6 +22,7 @@ func (s *simulations) Get(id string) (*models.Simulation, error) {
 	}
 
 	if err != nil {
+		log.Error().Err(err).Str("id", id).Msg("failed to Get simulation")
 		return nil, err
 	}
 
@@ -35,7 +37,7 @@ func (s *simulations) List() ([]models.Simulation, error) {
 		var sim models.Simulation
 		err := json.Unmarshal(v, &sim)
 		if err != nil {
-			return fmt.Errorf("failed to deserialize simulation %s", k)
+			return fmt.Errorf("failed to deserialize simulation %s, %s", k, err.Error())
 		}
 
 		items = append(items, sim)
@@ -43,6 +45,7 @@ func (s *simulations) List() ([]models.Simulation, error) {
 	})
 
 	if err != nil {
+		log.Error().Err(err).Msg("failed to list simulations")
 		return nil, err
 	}
 

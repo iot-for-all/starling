@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
 type (
@@ -35,22 +36,33 @@ type (
 		ReportedPropsInterval int                      `json:"reportedPropertyInterval"` // interval to wait between sending reported properties.
 		DisconnectBehavior    DeviceDisconnectBehavior `json:"disconnectBehavior"`       // device connection behavior.
 		TelemetryFormat       TelemetryFormat          `json:"telemetryFormat"`          // format of telemetry messages.
+		LastUpdatedTime       time.Time                `json:"lastUpdatedTime"`          // when the status was last updated
+	}
+
+	// SimulationViewDeviceConfig defines the device configuration for a simulation view.
+	SimulationViewDeviceConfig struct {
+		ID               string `json:"id"`               // the id of the configuration
+		ModelID          string `json:"modelId"`          // the model to simulate.
+		ProvisionedCount int    `json:"provisionedCount"` // number of provisioned devices.
+		SimulatedCount   int    `json:"simulatedCount"`   // number of devices to simulate.
+		ConnectedCount   int    `json:"connectedCount"`   // number of devices currently connected.
+	}
+
+	SimulationView struct {
+		Simulation                              // simulation configuration
+		Devices    []SimulationViewDeviceConfig `json:"devices"` // devices configurations
 	}
 )
 
 const (
-	// SimulationStatusUnknown specifies that the state of the simulation is unknown.
-	SimulationStatusUnknown SimulationStatus = "unknown"
-	// SimulationStatusCreated specifies that the simulation has been crated.
-	SimulationStatusCreated SimulationStatus = "created"
-	// SimulationStatusStarting specifies that the simulation is starting.
-	SimulationStatusStarting SimulationStatus = "starting"
+	// SimulationStatusReady specifies that the simulation is ready to run or provision devices.
+	SimulationStatusReady SimulationStatus = "ready"
 	// SimulationStatusRunning specifies that the simulation is running.
 	SimulationStatusRunning SimulationStatus = "running"
-	// SimulationStatusStopping specifies that the simulation is stopping.
-	SimulationStatusStopping SimulationStatus = "stopping"
-	// SimulationStatusStopped specifies that the simulation is stopped.
-	SimulationStatusStopped SimulationStatus = "stopped"
+	// SimulationStatusProvisioning specifies that the simulation is provisioning devices.
+	SimulationStatusProvisioning SimulationStatus = "provisioning"
+	// SimulationStatusDeleting specifies that the devices in the simulation are getting deleted.
+	SimulationStatusDeleting SimulationStatus = "deleting"
 
 	// DeviceDisconnectNever specifies that the device should never disconnect.
 	DeviceDisconnectNever DeviceDisconnectBehavior = "never"
@@ -74,14 +86,17 @@ func (status *SimulationStatus) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
+	// backward compat
+	if p == "created" || p == "stopped" {
+		p = "ready"
+	}
+
 	s := SimulationStatus(p)
 	switch s {
-	case SimulationStatusCreated,
+	case SimulationStatusReady,
 		SimulationStatusRunning,
-		SimulationStatusStarting,
-		SimulationStatusStopped,
-		SimulationStatusStopping,
-		SimulationStatusUnknown:
+		SimulationStatusProvisioning,
+		SimulationStatusDeleting:
 		*status = s
 		return nil
 	default:

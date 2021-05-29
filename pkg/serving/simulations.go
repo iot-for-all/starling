@@ -6,10 +6,12 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/iot-for-all/starling/pkg/models"
 	"github.com/iot-for-all/starling/pkg/storing"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // simulationDetail represents simulation along with device configurations.
@@ -73,6 +75,8 @@ func upsertSimulation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sim.Status = models.SimulationStatusReady
+	sim.LastUpdatedTime = time.Now()
 	err = storing.Simulations.Set(&sim)
 	if handleError(err, w) {
 		return
@@ -141,6 +145,13 @@ func provisionDevices(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if sim.Status != models.SimulationStatusReady {
+		msg := fmt.Sprintf("Devices cannot be provisioned while it is in status '%s'.", sim.Status)
+		log.Error().Msg(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
 	target, err := storing.Targets.Get(sim.TargetID)
 	if handleError(err, w) {
 		return
@@ -172,7 +183,26 @@ func provisionDevices(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// update sim status to provisioning
+	if err := updateSimulationStatus(sim, models.SimulationStatusProvisioning); err != nil {
+		if handleError(err, w) {
+			return
+		}
+	}
+
 	if err := controller.ProvisionDevices(r.Context(), sim, target, model, maxDeviceID, numDevices); err != nil {
+		if err2 := updateSimulationStatus(sim, models.SimulationStatusReady); err2 != nil {
+			if handleError(err2, w) {
+				return
+			}
+		}
+		if handleError(err, w) {
+			return
+		}
+	}
+
+	// update sim status to ready
+	if err := updateSimulationStatus(sim, models.SimulationStatusReady); err != nil {
 		if handleError(err, w) {
 			return
 		}
@@ -252,4 +282,12 @@ func deleteDevices(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+}
+func updateSimulationStatus(simulation *models.Simulation, status models.SimulationStatus) error {
+	// update the status of simulation
+	simulation.Status = status
+	simulation.LastUpdatedTime = time.Now()
+
+	err := storing.Simulations.Set(simulation)
+	return err
 }

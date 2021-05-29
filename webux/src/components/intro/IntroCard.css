@@ -1,0 +1,36 @@
+.todoItem {
+  padding: 2px 4px;
+  background-color: rgba(32, 107, 196, 0.03);
+  border: 1px solid rgba(32, 107, 196, 0.064);
+  border-radius: 4px;
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.introImageContainer {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+.introNumber {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background-color: rgba(238, 239, 240, 0.40);
+  border: 1px solid white;
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  width: 24px;
+  height: 24px;
+}
+
+.introDescription {
+  font-size: 0.85rem;
+}
+
+.introStatus {
+  font-size: 0.85rem;
+  font-weight: 600;
+}

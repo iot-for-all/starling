@@ -26,4 +26,10 @@ type (
 		DeviceID         string `json:"deviceId"`         // device identifier in the target.
 		ConnectionString string `json:"connectionString"` // IoT Hub connection string for the device.
 	}
+
+	// SimulationTargetView specifies the target to be added
+	SimulationTargetView struct {
+		SimulationTarget      // Target application for the simulation
+		ImportModels     bool `json:"importModels"` // Should models be imported when a new SimulationTarget is added
+	}
 )

@@ -5,6 +5,7 @@ import "github.com/prometheus/client_golang/prometheus"
 var (
 	simulatedDeviceGauge         *prometheus.GaugeVec
 	connectedDeviceGauge         *prometheus.GaugeVec
+	connectedDeviceByModelGauge  *prometheus.GaugeVec
 	deviceConnectLatency         *prometheus.HistogramVec
 	deviceFailoverTotal          *prometheus.CounterVec
 	provisionSuccessTotal        *prometheus.CounterVec
@@ -48,6 +49,16 @@ func init() {
 			Help:      "Total number of devices connected",
 		},
 		[]string{"sim", "target", "model", "hub"},
+	)
+
+	connectedDeviceByModelGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: "starling",
+			Subsystem: "simulating",
+			Name:      "connect_total_by_model",
+			Help:      "Total number of devices connected",
+		},
+		[]string{"sim", "target", "model"},
 	)
 
 	deviceConnectLatency = prometheus.NewHistogramVec(
@@ -268,6 +279,7 @@ func init() {
 		simulatedDeviceGauge,
 		deviceConnectLatency,
 		connectedDeviceGauge,
+		connectedDeviceByModelGauge,
 		deviceFailoverTotal,
 		provisionSuccessTotal,
 		provisionFailuresTotal,

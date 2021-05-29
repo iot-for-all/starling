@@ -1,0 +1,14 @@
+.darkHeader{
+    background-color: #232e3c;
+    padding: .25rem;
+}
+
+.hamburgerBtn {
+    color: white;
+    background-color: transparent;
+}
+
+.hamburgerBtn:hover {
+    color: lightgray;
+}
+

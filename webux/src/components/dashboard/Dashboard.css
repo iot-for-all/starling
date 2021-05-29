@@ -1,0 +1,77 @@
+.dashboardCard {
+  margin-bottom: 0rem;
+}
+
+.dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: stretch;
+  background-color: white;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  border-radius: 3px;
+}
+
+.dashboardItem {
+  width: 48%;
+  margin: 8px;
+  padding-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.dashboardItem th {
+  font-size: 0.8rem;
+  padding: 5px;
+}
+
+.dashboardItem table {
+  font-size: 0.8rem;
+}
+
+.dashboardItem td {
+  padding: 5px;
+}
+
+.countLabel {
+  float: right;
+  padding-right: 5px;
+}
+
+.simProgressCardContainer {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.simProgressCardItem {
+  width: 225px;
+  min-width: 100px;
+  margin: 5px;
+  flex: 1 0 0;
+  flex-grow: 1;
+  font-size: 0.9rem;
+}
+
+.simProgressTime {
+  font-size: 0.8rem;
+}
+
+.simFieldsTable table {
+  font-size: 0.8rem;
+}
+
+.simFieldsTable td:first-child {
+  text-transform: uppercace;
+  font-weight: 600;
+}
+
+.simToolBar {
+  font-weight: 600;
+  min-height: 1.5rem;
+  width: 100%;
+  margin: 0px;
+  padding: 0.5rem;
+}
+
+.linkBtn {
+  color: white;
+}

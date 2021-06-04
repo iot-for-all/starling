@@ -15,17 +15,17 @@ import (
 
 // Controller responsible for starting and stopping simulations; provisioning and deleting devices from a target application.
 type Controller struct {
-	context       context.Context          // parent program context.
-	simulationCfg *config.SimulationConfig // simulator configuration.
-	simulations   map[string]*simulating.Simulator
+	context     context.Context      // parent program context.
+	globalCfg   *config.GlobalConfig // global configuration.
+	simulations map[string]*simulating.Simulator
 }
 
 // NewController creates a new controller.
-func NewController(context context.Context, simulatorCfg *config.SimulationConfig) *Controller {
+func NewController(context context.Context, globalConfig *config.GlobalConfig) *Controller {
 	return &Controller{
-		context:       context,
-		simulationCfg: simulatorCfg,
-		simulations:   map[string]*simulating.Simulator{},
+		context:     context,
+		globalCfg:   globalConfig,
+		simulations: map[string]*simulating.Simulator{},
 	}
 }
 
@@ -35,7 +35,7 @@ func (c *Controller) StartSimulation(simulation *models.Simulation) error {
 		return fmt.Errorf("simulation %s is already running. stop it first and then try running it again", simulation.ID)
 	}
 
-	simulator, err := simulating.Start(c.context, c.simulationCfg, simulation)
+	simulator, err := simulating.Start(c.context, &c.globalCfg.Simulation, simulation)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func (c *Controller) StopSimulation(simulation *models.Simulation) error {
 
 // ProvisionDevices provisions devices in a target based on the deviceConfig.
 func (c *Controller) ProvisionDevices(ctx context.Context, simulation *models.Simulation, target *models.SimulationTarget, model *models.DeviceModel, maxDeviceID int, numDevices int) error {
-	provisioner := simulating.NewProvisioner(c.context, c.simulationCfg)
+	provisioner := simulating.NewProvisioner(c.context, &c.globalCfg.Simulation)
 
 	wg := sync.WaitGroup{}
 	for i := 1; i <= numDevices; i++ {
@@ -79,7 +79,7 @@ func (c *Controller) ProvisionDevices(ctx context.Context, simulation *models.Si
 			go c.provisionDevice(simulation, target, model, deviceID, provisioner, &wg)
 
 			// throttle DPS registrations
-			if i%c.simulationCfg.MaxConcurrentRegistrations == 0 {
+			if i%c.globalCfg.Simulation.MaxConcurrentRegistrations == 0 {
 				wg.Wait()
 			}
 
@@ -151,7 +151,7 @@ func (c *Controller) DeleteAllDevices(ctx context.Context, sim *models.Simulatio
 			go c.deleteDevice(ctx, target, td.DeviceID, &wg)
 
 			// throttle API calls to Central
-			if i%c.simulationCfg.MaxConcurrentDeletes == 0 {
+			if i%c.globalCfg.Simulation.MaxConcurrentDeletes == 0 {
 				wg.Wait()
 			}
 
@@ -194,7 +194,7 @@ func (c *Controller) DeleteDevices(ctx context.Context, simulation *models.Simul
 			go c.deleteDevice(ctx, target, deviceID, &wg)
 
 			// throttle API calls to Central
-			if i%c.simulationCfg.MaxConcurrentDeletes == 0 {
+			if i%c.globalCfg.Simulation.MaxConcurrentDeletes == 0 {
 				wg.Wait()
 			}
 
@@ -271,4 +271,30 @@ func (c *Controller) GetConnectedDeviceCount(simulation *models.Simulation, mode
 	}
 
 	return sim.GetConnectedDeviceCount(modelId)
+}
+
+func (c *Controller) GetMetricsStatus(ctx context.Context) models.MetricsStatus {
+	return models.MetricsStatus{
+		GrafanaServer:    c.getServerStatus(ctx, "Grafana", c.globalCfg.HTTP.GrafanaPort),
+		PrometheusServer: c.getServerStatus(ctx, "Prometheus", c.globalCfg.HTTP.PrometheusPort),
+	}
+}
+
+func (c *Controller) getServerStatus(ctx context.Context, name string, portNumber int) bool {
+	path := fmt.Sprintf("http://localhost:%d", portNumber)
+	req, err := http.NewRequestWithContext(ctx, "GET", path, nil)
+	if err != nil {
+		log.Err(err).Str("path", path).Msg(fmt.Sprintf("error creating %s server status request", name))
+		return false
+	}
+
+	client := http.Client{
+		Timeout: time.Duration(10) * time.Second,
+	}
+	_, err = client.Do(req)
+	if err != nil {
+		log.Err(err).Str("path", path).Msg("error getting Grafana server status request")
+		return false
+	}
+	return true
 }

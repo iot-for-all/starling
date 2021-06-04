@@ -275,12 +275,13 @@ func (d *DataGenerator) getFloat() float32 {
 
 // getInt gets a a geopoint along a predefined route in Redmond.
 func (d *DataGenerator) getGeopoint() map[string]interface{} {
-	d.nextGeoPoint = (d.nextGeoPoint + 1) % len(d.geopointRoute)
-	return map[string]interface{}{
+	point := map[string]interface{}{
 		"lat": d.geopointRoute[d.nextGeoPoint][0],
 		"lon": d.geopointRoute[d.nextGeoPoint][1],
 		"alt": d.geopointRoute[d.nextGeoPoint][2],
 	}
+	d.nextGeoPoint = (d.nextGeoPoint + 1) % len(d.geopointRoute)
+	return point
 }
 
 // getInt gets a random integer.

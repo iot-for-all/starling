@@ -47,13 +47,11 @@ const AppCard = (props) => {
         //console.log("value changed target: ", event.target, " value: ", event.target.value, ", updatedApp: ", updatedApp);
     }
     const changeIDHandler = (event) => {
-        if (event.target.value.match(/^[a-z0-9]+$/)) {
-            let updatedApp = {
-                ...app,
-                [event.target.name]: event.target.value
-            }
-            setApp(updatedApp);
+        let updatedApp = {
+            ...app,
+            [event.target.name]: event.target.value.toLowerCase()
         }
+        setApp(updatedApp);
     }
 
     const onSubmit = async (event) => {
@@ -190,7 +188,7 @@ const AppCard = (props) => {
                     </p>
                     <Form.Group
                         isRequired
-                        label="Application ID"
+                        label="Application ID (E.g: app1)"
                     >
                         <Grid.Row gutters="xs">
                             <Grid.Col>
@@ -208,7 +206,7 @@ const AppCard = (props) => {
                                 className="align-self-center"
                             >
                                 <HelpPopup content={<>
-                                    <p>Unique ID for the application. Only lowecase alphanumeric characters are allowed.</p>
+                                    <p>Unique ID for the application. Only lowecase alphanumeric characters are allowed. E.g.: <strong>app1</strong></p>
                                     <p>Devices in a simulation are named SimID-AppID-ModelID-###.</p>Choose this ID wisely.</>} />
                             </Grid.Col>
                         </Grid.Row>
@@ -362,7 +360,7 @@ const AppCard = (props) => {
                     </Form.Group>
                     <Form.Group
                         isRequired
-                        label="Master Key"
+                        label="Device Connection SAS Key"
                     >
                         <Grid.Row gutters="xs">
                             <Grid.Col>
@@ -372,7 +370,7 @@ const AppCard = (props) => {
                                     required
                                     onChange={changeHandler}
                                     invalid={errors.masterKey ? true : false}
-                                    feedback="Master Key is required"
+                                    feedback="Device Connection SAS Key is required"
                                 />
                             </Grid.Col>
                             <Grid.Col
@@ -380,13 +378,13 @@ const AppCard = (props) => {
                                 className="align-self-center"
                             >
                                 <HelpPopup content={<>
-                                    <p>The <strong>Master Key</strong> for the IoT Central application.</p>
+                                    <p>The <strong>Device Connection SAS Key</strong> for the IoT Central application.</p>
                                     <p>You can get it from IoT Central application <strong>Administration</strong> <Icon prefix="fe" name="arrow-right" /> {" "}
                                         <strong>Device Connection</strong> <Icon prefix="fe" name="arrow-right" /> {" "}
                                         <strong>SAS-IoT-Devices</strong> <Icon prefix="fe" name="arrow-right" /> {" "}
                                         <strong>Shared access signature (SAS)</strong> <Icon prefix="fe" name="arrow-right" /> {" "}
                                         <strong>Primary key</strong>.</p>
-                                    <p>This Master Key is used during provisioning of simulated devices.</p>
+                                    <p>This Device Connection SAS Key is used during provisioning of simulated devices.</p>
                                     Currently, X509 certificates are not supported in Starling.
                                     </>} />
                             </Grid.Col>

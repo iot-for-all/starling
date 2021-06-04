@@ -7,12 +7,13 @@ const GlobalContext = React.createContext({
     models: [],
     simulations: [],
     config: {},
+    metricsStatus: {},
     initializeData: () => { },
     getApplication: (appId) => { },
     listApplications: () => { },
     addApplication: (payload) => { },
-    updateAppcation: (payload) => { },
-    deleteAppcation: (appId) => { },
+    updateApplication: (payload) => { },
+    deleteApplication: (appId) => { },
     getModel: (modelId) => { },
     listModels: () => { },
     addModel: (payload) => { },
@@ -30,6 +31,7 @@ const GlobalContext = React.createContext({
     provisionSimulationDevices: (simId, payload) => { },
     getConfig: () => { },
     updateConfig: (payload) => { },
+    refreshMetricsStatus: () => {},
 });
 
 export const GlobalContextProvider = (props) => {
@@ -38,6 +40,7 @@ export const GlobalContextProvider = (props) => {
     const [models, setModels] = useState([]);
     const [simulations, setSimulations] = useState([]);
     const [config, setConfig] = useState();
+    const [metricsStatus, setMetricsStatus] = useState();
     const BASE_URL = (process.env.NODE_ENV !== "production") ? "http://localhost:6001/webapi" : "/webapi";
 
     const initializeData = async () => {
@@ -46,10 +49,12 @@ export const GlobalContextProvider = (props) => {
             const remoteModels = await axios.get(`${BASE_URL}/model`);
             const remoteSimulations = await axios.get(`${BASE_URL}/simulation`);
             const remoteConfig = await axios.get(`${BASE_URL}/config`);
+            const remoteMetricsStatus = await axios.get(`${BASE_URL}/config/metricsStatus`);
             setApps(remoteApps.data);
             setModels(remoteModels.data);
             setSimulations(remoteSimulations.data);
             setConfig(remoteConfig.data);
+            setMetricsStatus(remoteMetricsStatus.data);
             setInitialized(true);
         /*} catch (err) {
             console.log(err);
@@ -179,6 +184,12 @@ export const GlobalContextProvider = (props) => {
         setConfig(remoteConfig.data);
     }
 
+    const refreshMetricsStatus = async () => {
+        const res = await axios.get(`${BASE_URL}/config/metricsStatus`);
+        setMetricsStatus(res.data);
+        return res.data;
+    }
+
     return (
         <GlobalContext.Provider
             value={{
@@ -187,6 +198,7 @@ export const GlobalContextProvider = (props) => {
                 models: models,
                 simulations: simulations,
                 config: config,
+                metricsStatus: metricsStatus,
                 initializeData: initializeData,
                 getApplication: getApplication,
                 listApplications: listApplications,
@@ -210,6 +222,7 @@ export const GlobalContextProvider = (props) => {
                 provisionSimulationDevices: provisionSimulationDevices,
                 getConfig: getConfig,
                 updateConfig: updateConfig,
+                refreshMetricsStatus: refreshMetricsStatus,
             }}
         >
             {props.children}

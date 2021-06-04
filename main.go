@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/iot-for-all/starling/pkg/config"
 	"github.com/iot-for-all/starling/pkg/controlling"
@@ -10,7 +11,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"gopkg.in/yaml.v3"
 	"io"
 	"os"
 	"os/exec"
@@ -47,7 +47,7 @@ func main() {
 	}
 
 	// Initialize the controller.
-	controller := controlling.NewController(ctx, &cfg.Simulation)
+	controller := controlling.NewController(ctx, cfg)
 	controller.ResetSimulationStatus()
 
 	// Start the admin and metrics http endpoints
@@ -98,9 +98,9 @@ func loadConfig() (*config.GlobalConfig, error) {
 	if err != nil {
 		fmt.Printf("error reading current directory: %s\n", err)
 	}
-	configFileName := path.Join(exeDir, "starling.yaml")
+	configFileName := path.Join(exeDir, "starling.json")
 	if _, err := os.Stat(configFileName); os.IsNotExist(err) {
-		content, err := yaml.Marshal(cfg)
+		content, err := json.MarshalIndent(cfg, "", "  ")
 		if err != nil {
 			fmt.Printf("error reading current directory: %s\n", err)
 		} else {
@@ -113,7 +113,7 @@ func loadConfig() (*config.GlobalConfig, error) {
 
 	// read the config file
 	content, err := os.ReadFile(configFileName)
-	err = yaml.Unmarshal(content, &cfg)
+	err = json.Unmarshal(content, &cfg)
 	if err != nil {
 		fmt.Printf("error reading config file %s: %s", configFileName, err)
 	}

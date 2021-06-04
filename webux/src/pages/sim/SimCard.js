@@ -59,13 +59,11 @@ const SimCard = (props) => {
     }
 
     const changeIDHandler = (event) => {
-        if (event.target.value.match(/^[a-z0-9]+$/)) {
-            let updatedSim = {
-                ...sim,
-                [event.target.name]: event.target.value
-            }
-            setSim(updatedSim);
+        let updatedSim = {
+            ...sim,
+            [event.target.name]: event.target.value.toLowerCase()
         }
+        setSim(updatedSim);
     }
 
     const changeNumberHandler = (event) => {
@@ -361,7 +359,7 @@ const SimCard = (props) => {
                                 <h4>Base Configuration</h4>
                                 <Form.Group
                                     isRequired
-                                    label="Simulation ID"
+                                    label="Simulation ID (E.g.: sim1)"
                                 >
                                     <Grid.Row gutters="xs">
                                         <Grid.Col>
@@ -380,7 +378,7 @@ const SimCard = (props) => {
                                             className="align-self-center"
                                         >
                                             <HelpPopup content={<>
-                                                <p>Unique ID for the simulation. Only lowecase alphanumeric characters are allowed.</p>
+                                                <p>Unique ID for the simulation. Only lowecase alphanumeric characters are allowed. E.g.: <strong>sim1</strong></p>
                                                 <p>Devices in a simulation are named SimID-AppID-ModelID-###.</p>Choose this ID wisely.</>} />
                                         </Grid.Col>
                                     </Grid.Row>

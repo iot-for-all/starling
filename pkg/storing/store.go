@@ -26,7 +26,7 @@ type store struct {
 // Open initializes and opens the database
 func Open(cfg *config.StoreConfig) error {
 	// TODO: Open with correct badger options
-	dbFile := fmt.Sprintf("%s/.db", cfg.DataDirectory)
+	dbFile := fmt.Sprintf("%s", cfg.DataDirectory)
 	opts := badger.DefaultOptions(dbFile)
 	//b, _ := json.MarshalIndent(opts, "", "  ")
 	//fmt.Printf("%s\n", b)

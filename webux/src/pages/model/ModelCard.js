@@ -42,13 +42,11 @@ const ModelCard = (props) => {
     }
 
     const changeIDHandler = (event) => {
-        if (event.target.value.match(/^[a-z0-9]+$/)) {
-            let updatedModel = {
-                ...model,
-                [event.target.name]: event.target.value
-            }
-            setModel(updatedModel);
+        let updatedModel = {
+            ...model,
+            [event.target.name]: event.target.value.toLowerCase()
         }
+        setModel(updatedModel);
     }
 
     const onSubmit = async (event) => {
@@ -175,7 +173,7 @@ const ModelCard = (props) => {
                                 className="align-self-center"
                             >
                                 <HelpPopup content={<>
-                                    <p>Unique ID for the model. Only lowecase alphanumeric characters are allowed.</p>
+                                    <p>Unique ID for the model. Only lowecase alphanumeric characters are allowed. E.g.: <strong>mymodel</strong></p>
                                     <p>Devices in a simulation are named SimID-AppID-ModelID-###.</p>Choose this ID wisely.</>} />
                             </Grid.Col>
                         </Grid.Row>

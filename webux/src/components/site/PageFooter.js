@@ -1,6 +1,5 @@
 import {Fragment} from  "react";
 import {
-    Button,
     Container,
     Grid,
     List
@@ -27,19 +26,6 @@ const PageFooter = (props) => {
                                             <a href="https://github.com/iot-for-all/starling/issues">Issues</a>
                                         </List.Item>
                                     </List>
-                                </Grid.Col>
-                                <Grid.Col auto={true}>
-                                    <Button
-                                        href="https://github.com/iot-for-all/starling"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        size="sm"
-                                        outline
-                                        color="primary"
-                                        RootComponent="a"
-                                    >
-                                        Source code
-                                </Button>
                                 </Grid.Col>
                             </Grid.Row>
                         </Grid.Col>

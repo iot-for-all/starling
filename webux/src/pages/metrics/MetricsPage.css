@@ -1,0 +1,61 @@
+.serverCardContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.serverCard {
+    margin-bottom: 0rem;
+    height: 175px;
+}
+  
+
+.serverCardItem {
+  width: 225px;
+  min-width: 100px;
+  margin: 5px;
+  flex: 1 0 0;
+  flex-grow: 1;
+  font-size: 0.9rem;
+  align-content: stretch;
+}
+
+.serverCardArrow {
+    width: 225px;
+    min-width: 100px;
+    margin: 5px;
+    flex: 1 0 0;
+    flex-grow: 1;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.arrowText {
+    font-size: 0.8rem;
+}
+
+.arrow-right:after {
+  content: "";
+  display: inline-block !important;
+  width: 0;
+  height: 0;
+  border-left: 8px solid #495057;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  vertical-align: middle;
+}
+
+.arrow-right:before {
+  width: 150px;
+  height: 2px;
+  background: #495057;
+  content: "";
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.serverLogo {
+    height: 100px;
+    width: auto;
+}

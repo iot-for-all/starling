@@ -11,8 +11,10 @@ type (
 	}
 
 	HTTPConfig struct {
-		AdminPort   int `yaml:"adminPort" json:"adminPort"`     // port number of the administration API server
-		MetricsPort int `yaml:"metricsPort" json:"metricsPort"` // port number of prometheus metrics server
+		AdminPort      int `yaml:"adminPort" json:"adminPort"`           // port number of the administration API server
+		MetricsPort    int `yaml:"metricsPort" json:"metricsPort"`       // port number where prometheus metrics are published
+		GrafanaPort    int `yaml:"grafanaPort" json:"grafanaPort"`       // port number where Grafana server is listening
+		PrometheusPort int `yaml:"prometheusPort" json:"prometheusPort"` // port number where Prometheus server is listening
 	}
 
 	SimulationConfig struct {
@@ -34,10 +36,10 @@ type (
 	}
 
 	GlobalConfig struct {
-		Logger     LoggerConfig     `yaml:"Logger" json:"Logger"`
-		Data       StoreConfig      `yaml:"Data" json:"Data"`
-		HTTP       HTTPConfig       `yaml:"HTTP" json:"HTTP"`
-		Simulation SimulationConfig `yaml:"Simulation" json:"Simulation"`
+		Logger     LoggerConfig     `yaml:"logger" json:"logger"`
+		Data       StoreConfig      `yaml:"data" json:"data"`
+		HTTP       HTTPConfig       `yaml:"http" json:"http"`
+		Simulation SimulationConfig `yaml:"simulation" json:"simulation"`
 	}
 )
 
@@ -48,11 +50,13 @@ func NewConfig() *GlobalConfig {
 			LogsDir:  "./logs",
 		},
 		Data: StoreConfig{
-			DataDirectory: "./",
+			DataDirectory: "./data",
 		},
 		HTTP: HTTPConfig{
-			AdminPort:   6001,
-			MetricsPort: 6002,
+			AdminPort:      6001,
+			MetricsPort:    6002,
+			GrafanaPort:    3000,
+			PrometheusPort: 9090,
 		},
 		Simulation: SimulationConfig{
 			ConnectionTimeout:          10000,

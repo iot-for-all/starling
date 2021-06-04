@@ -11,6 +11,7 @@ import Toolbar from '../../components/toolbar/Toolbar';
 import SiteWrapper from '../../components/site/SiteWrapper';
 import ListDetails from '../../components/listdetails/ListDetails';
 import ModelCard from './ModelCard';
+import ImportCard from "./ImportCard";
 import * as Utils from "../../utils/utils";
 
 const ModelPage = () => {
@@ -22,7 +23,8 @@ const ModelPage = () => {
     const [backendError, setBackendError] = useState("");
     const id = params.id;
     const history = useHistory();
-    const pageMode = (queryParams.has("new")) ? "add" : "edit";
+    const pageMode = (queryParams.has("new") || queryParams.has("import")) ? "add" : "edit";
+    const isImportMode = (queryParams.has("import"));
 
     // Called on mount to ensure reference data is loaded if coming from shortcut
     useEffect(() => {
@@ -83,12 +85,30 @@ const ModelPage = () => {
         backendError={backendError}
     /> : "";
 
+    const importCard = <ImportCard
+        backendError={backendError}
+    />;
+
+    let showImport = (globalContext.initialized && globalContext.apps.length > 0 && !isImportMode) ? true : false;
+
     return (
         <SiteWrapper>
             <Page.Content title="Device Models">
                 <Toolbar
                     countMessage={modelCount}
                 >
+                    {
+                        showImport &&
+                        <span title="Add a Device Model" className="mr-2">
+                            <Link
+                                to="/model/add?import"
+                                className="btn btn-sm btn-primary"
+                            >
+                                <Icon prefix="fe" name="download" />
+                        Import
+                    </Link>
+                        </span>
+                    }
                     <span title="Add a Device Model">
                         <Link
                             to="/model/add?new"
@@ -103,7 +123,7 @@ const ModelPage = () => {
                     listTitle={"Models"}
                     list={modelsList}
                     detailsTitle={"Edit Device Model"}
-                    detailsForm={modelCard}
+                    detailsForm={isImportMode ? importCard : modelCard}
                     backendError={backendError}
                 />
             </Page.Content>

@@ -11,6 +11,7 @@ import ModelPage from './pages/model/ModelPage';
 import SimLandingPage from './pages/sim/SimLandingPage';
 import SimPage from './pages/sim/SimPage';
 import SettingsPage from './pages/settings/SettingsPage';
+import MetricsPage from './pages/metrics/MetricsPage';
 import Error404Page from './pages/error/Error404Page';
 import "tabler-react/dist/Tabler.css";
 
@@ -28,6 +29,7 @@ function App() {
             <Route exact path="/sim" component={SimLandingPage} />
             <Route exact path="/sim/:id" component={SimPage} />
             <Route exact path="/settings" component={SettingsPage} />
+            <Route exact path="/metrics" component={MetricsPage} />
             <Route component={Error404Page} />
           </Switch>
         </GlobalContextProvider>

@@ -34,6 +34,13 @@ const SimLandingPage = () => {
         description = "You need to add an IoT Central Application before you create a new Simulation.";
     }
 
+    const actions = [
+        {
+            actionName: actionName,
+            actionUrl: actionUrl,
+            actionIcon: "plus"
+        }
+    ];
     return simCount > 0 ? <Redirect to={redir} /> :
         <SiteWrapper>
             <Page.Content title="">
@@ -41,9 +48,7 @@ const SimLandingPage = () => {
                     message="Simulations"
                     description="Simulations will show up here. Multiple simulations can be concurrently executed against IoT Central applications."
                     description2={description}
-                    actionName={actionName}
-                    actionUrl={actionUrl}
-                    actionIcon="plus"
+                    actions={actions}
                     noDataImage="/images/emptySimulations.svg"
                 />
             </Page.Content>

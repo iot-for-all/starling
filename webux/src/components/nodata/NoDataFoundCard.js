@@ -8,6 +8,16 @@ import "./NoDataFoundCard.css";
 
 const NoDataFoundCard = (props) => {
     const noDataImage = (props.noDataImage) ? props.noDataImage : "/images/nodata.svg";
+    const actions = props.actions.map((action) => {
+        return (<Link
+            key={action.actionName}
+            to={action.actionUrl}
+            className="btn btn-sm btn-primary mr-2"
+        >
+            <Icon prefix="fe" name={action.actionIcon} />
+            {action.actionName}
+        </Link>)
+    });
     return (
         <div className="empty">
             <div className="empty-image">
@@ -24,13 +34,7 @@ const NoDataFoundCard = (props) => {
                 </p>
             }
             <div className="empty-action">
-                <Link
-                    to={props.actionUrl}
-                    className="btn btn-sm btn-primary"
-                >
-                    <Icon prefix="fe" name={props.actionIcon} />
-                    {props.actionName}
-                </Link>
+                {actions}
             </div>
         </div>
     );

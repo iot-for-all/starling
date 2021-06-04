@@ -16,6 +16,7 @@ import SiteWrapper from '../../components/site/SiteWrapper';
 import HelpPopup from "../../components/help/HelpPopup";
 import * as Utils from '../../utils/utils';
 import "./SettingsPage.css";
+import * as Notification from "../../components/notification/Notification";
 
 const SettingsPage = () => {
     const globalContext = useContext(GlobalContext)
@@ -23,6 +24,9 @@ const SettingsPage = () => {
     const [config, setConfig] = useState();
     const [errors, setErrors] = useState({});
     const [backendError, setBackendError] = useState("");
+    const [simWarning, setSimWarning] = useState(false);
+    const [appWarning, setAppWarning] = useState(false);
+    const [saved, setSaved] = useState(false);
 
     // Called on mount to ensure reference data is loaded if coming from shortcut
     useEffect(() => {
@@ -31,26 +35,41 @@ const SettingsPage = () => {
         }
 
         if (globalContext.config) {
+            // deep copy the config object so that the original config containing geopoint array
+            // does not get changed as we are converting it into string locally
             let localConfig = {
                 ...globalContext.config,
             };
-            if (localConfig.Simulation.geopointData) {
+            localConfig.data = {
+                ...globalContext.config.data
+            };
+            localConfig.http = {
+                ...globalContext.config.http
+            };
+            localConfig.logger = {
+                ...globalContext.config.logger
+            };
+            localConfig.simulation = {
+                ...globalContext.config.simulation
+            };
+            if (localConfig.simulation.geopointData) {
                 // default JSON Stringify is spewing too many lines, so we are building a simple JSON strings (one line per geopoint) below
                 //localConfig.Simulation.geopointData = JSON.stringify(localConfig.Simulation.geopointData, null, 2);
                 let str = "[\n";
-                for (let i = 0; i < localConfig.Simulation.geopointData.length; i++) {
-                    str += "  [" + localConfig.Simulation.geopointData[i][0] + ", " + localConfig.Simulation.geopointData[i][1] + ", " + localConfig.Simulation.geopointData[i][2] + "]";
-                    if (i < localConfig.Simulation.geopointData.length - 1) {
+                for (let i = 0; i < localConfig.simulation.geopointData.length; i++) {
+                    str += "  [" + localConfig.simulation.geopointData[i][0] + ", " + localConfig.simulation.geopointData[i][1] + ", " + localConfig.simulation.geopointData[i][2] + "]";
+                    if (i < localConfig.simulation.geopointData.length - 1) {
                         str += ",\n";
                     } else {
                         str += "\n";
                     }
                 }
                 str += "]";
-                localConfig.Simulation.geopointData = str;
+                localConfig.simulation.geopointData = str;
             }
 
             setConfig(localConfig);
+            setBackendError("");
         } else {
             setBackendError("Failed to get settings. Make sure that the Starling server is running.");
         }
@@ -61,52 +80,60 @@ const SettingsPage = () => {
     // need to change this
     const changeSimHandler = (event) => {
         let updatedSim = {
-            ...config.Simulation,
+            ...config.simulation,
             [event.target.name]: event.target.value
         };
         let updatedConfig = {
             ...config,
-            Simulation: updatedSim,
+            simulation: updatedSim,
         };
         setConfig(updatedConfig);
+        setSimWarning(true);
+        setSaved(false);
     }
 
     const changeSimCheckHandler = (event) => {
         let updatedSim = {
-            ...config.Simulation,
+            ...config.simulation,
             [event.target.name]: event.target.checked
         };
         let updatedConfig = {
             ...config,
-            Simulation: updatedSim,
+            simulation: updatedSim,
         };
         setConfig(updatedConfig);
+        setSimWarning(true);
+        setSaved(false);
     }
 
     // need to change this
     const changeDataHandler = (event) => {
         let updatedData = {
-            ...config.Data,
+            ...config.data,
             [event.target.name]: event.target.value
         };
         let updatedConfig = {
             ...config,
-            Data: updatedData,
+            data: updatedData,
         };
         setConfig(updatedConfig);
+        setAppWarning(true);
+        setSaved(false);
     }
 
     // need to change this
     const changeLogHandler = (event) => {
         let updatedLog = {
-            ...config.Logger,
+            ...config.logger,
             [event.target.name]: event.target.value
         };
         let updatedConfig = {
             ...config,
-            Logger: updatedLog,
+            logger: updatedLog,
         };
         setConfig(updatedConfig);
+        setAppWarning(true);
+        setSaved(false);
     }
     // need to change this
     const changeSimulationNumberHandler = (event) => {
@@ -117,14 +144,16 @@ const SettingsPage = () => {
                 val = +event.target.value;
             }
             let updatedSim = {
-                ...config.Simulation,
+                ...config.simulation,
                 [event.target.name]: val
             };
             let updatedConfig = {
                 ...config,
-                Simulation: updatedSim,
+                simulation: updatedSim,
             };
             setConfig(updatedConfig);
+            setSimWarning(true);
+            setSaved(false);
         }
     }
 
@@ -137,14 +166,16 @@ const SettingsPage = () => {
                 val = +event.target.value;
             }
             let updatedHttp = {
-                ...config.HTTP,
+                ...config.http,
                 [event.target.name]: val
             };
             let updatedConfig = {
                 ...config,
-                HTTP: updatedHttp,
+                http: updatedHttp,
             };
             setConfig(updatedConfig);
+            setAppWarning(true);
+            setSaved(false);
         }
     }
 
@@ -154,63 +185,63 @@ const SettingsPage = () => {
         // validate form
         let newErrors = {};
         let hasErrors = false;
-        if (config.Simulation.connectionTimeout <= 0) {
+        if (config.simulation.connectionTimeout <= 0) {
             newErrors.connectionTimeout = true;
             hasErrors = true;
         }
-        if (config.Simulation.telemetryTimeout <= 0) {
+        if (config.simulation.telemetryTimeout <= 0) {
             newErrors.telemetryTimeout = true;
             hasErrors = true;
         }
-        if (config.Simulation.twinUpdateTimeout <= 0) {
+        if (config.simulation.twinUpdateTimeout <= 0) {
             newErrors.twinUpdateTimeout = true;
             hasErrors = true;
         }
-        if (config.Simulation.commandTimeout <= 0) {
+        if (config.simulation.commandTimeout <= 0) {
             newErrors.commandTimeout = true;
             hasErrors = true;
         }
-        if (config.Simulation.registrationAttemptTimeout <= 0) {
+        if (config.simulation.registrationAttemptTimeout <= 0) {
             newErrors.registrationAttemptTimeout = true;
             hasErrors = true;
         }
-        if (config.Simulation.maxConcurrentConnections <= 0) {
+        if (config.simulation.maxConcurrentConnections <= 0) {
             newErrors.maxConcurrentConnections = true;
             hasErrors = true;
         }
-        if (config.Simulation.maxConcurrentTwinUpdates <= 0) {
+        if (config.simulation.maxConcurrentTwinUpdates <= 0) {
             newErrors.maxConcurrentTwinUpdates = true;
             hasErrors = true;
         }
-        if (config.Simulation.maxConcurrentRegistrations <= 0) {
+        if (config.simulation.maxConcurrentRegistrations <= 0) {
             newErrors.maxConcurrentRegistrations = true;
             hasErrors = true;
         }
-        if (config.Simulation.maxConcurrentDeletes <= 0) {
+        if (config.simulation.maxConcurrentDeletes <= 0) {
             newErrors.maxConcurrentDeletes = true;
             hasErrors = true;
         }
-        if (config.Simulation.maxRegistrationAttempts <= 0) {
+        if (config.simulation.maxRegistrationAttempts <= 0) {
             newErrors.maxRegistrationAttempts = true;
             hasErrors = true;
         }
-        if (config.Simulation.geopointData.trim() === "") {
+        if (config.simulation.geopointData.trim() === "") {
             newErrors.geopointData = true;
             hasErrors = true;
         }
-        if (config.HTTP.adminPort <= 0) {
+        if (config.http.adminPort <= 0) {
             newErrors.adminPort = true;
             hasErrors = true;
         }
-        if (config.HTTP.metricsPort <= 0) {
+        if (config.http.metricsPort <= 0) {
             newErrors.maxConcurrentRegistrations = true;
             hasErrors = true;
         }
-        if (config.Logger.logsDir.trim().length === 0) {
+        if (config.logger.logsDir.trim().length === 0) {
             newErrors.logsDir = true;
             hasErrors = true;
         }
-        if (config.Data.path.trim().length === 0) {
+        if (config.data.path.trim().length === 0) {
             newErrors.logsDir = true;
             hasErrors = true;
         }
@@ -226,7 +257,7 @@ const SettingsPage = () => {
 
                 let foundError = false;
                 try {
-                    updatedConfig.Simulation.geopointData = JSON.parse(updatedConfig.Simulation.geopointData);
+                    updatedConfig.simulation.geopointData = JSON.parse(updatedConfig.simulation.geopointData);
                 } catch (ex2) {
                     setBackendError("Error parsing Geopoint Data: " + Utils.getErrorMessage(ex2, "error parsing JSON"));
                     foundError = true;
@@ -234,6 +265,16 @@ const SettingsPage = () => {
 
                 if (!foundError) {
                     await globalContext.updateConfig(updatedConfig);
+                    let msg = "Configuration is updated.";
+                    if (simWarning) {
+                        msg += " Restart simulations."
+                    }
+                    if (appWarning) {
+                        msg += " Restart Starling server."
+                    }
+                    Notification.addNotification("success", "Success", msg);
+
+                    setSaved(true);
                     history.replace(`/settings`);
                 }
             } catch (ex) {
@@ -248,6 +289,18 @@ const SettingsPage = () => {
                 <Icon prefix="fe" name="alert-triangle" />{" "}
                 {backendError}
             </div>}
+            {simWarning && saved &&
+                <div className="alert alert-warning">
+                    <Icon prefix="fe" name="alert-triangle" />{" "}
+                    Some of the simulation level settings are changed. Restart simulations to apply changes.
+                </div>
+            }
+            {appWarning && saved &&
+                <div className="alert alert-warning">
+                    <Icon prefix="fe" name="alert-triangle" />{" "}
+                    Some of the application level settings are changed. Restart Starling server to apply changes.
+                </div>
+            }
             {
                 config &&
                 <form onSubmit={onSubmit}>
@@ -267,15 +320,13 @@ const SettingsPage = () => {
                             </Card.Options>
                         </Card.Header>
                         <Card.Body>
-                            <p>
-                                <p>Configure Starling server using the following settings.</p>
-                            </p>
+                            <p>Configure Starling server using the following settings.</p>
                             <Form.FieldSet>
                                 <Grid.Row>
                                     <Grid.Col>
-                                        <p>
-                                            <Text className="text-default small"><Icon prefix="fe" name="alert-triangle" />{" "} Restart simulations to apply these changes.</Text>
-                                        </p>
+                                        <h6>
+                                            <Text className="text-default small"><strong><Icon prefix="fe" name="alert-triangle" />{" "} Restart simulations to apply these changes.</strong></Text>
+                                        </h6>
                                         <h4>Simulation Settings</h4>
                                         <Form.Group
                                             isRequired
@@ -285,7 +336,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="connectionTimeout"
-                                                        value={config.Simulation.connectionTimeout}
+                                                        value={config.simulation.connectionTimeout}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -310,7 +361,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="telemetryTimeout"
-                                                        value={config.Simulation.telemetryTimeout}
+                                                        value={config.simulation.telemetryTimeout}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -335,7 +386,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="twinUpdateTimeout"
-                                                        value={config.Simulation.twinUpdateTimeout}
+                                                        value={config.simulation.twinUpdateTimeout}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -361,7 +412,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="commandTimeout"
-                                                        value={config.Simulation.commandTimeout}
+                                                        value={config.simulation.commandTimeout}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -386,7 +437,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="registrationAttemptTimeout"
-                                                        value={config.Simulation.registrationAttemptTimeout}
+                                                        value={config.simulation.registrationAttemptTimeout}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -411,7 +462,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="maxConcurrentConnections"
-                                                        value={config.Simulation.maxConcurrentConnections}
+                                                        value={config.simulation.maxConcurrentConnections}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -437,7 +488,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="maxConcurrentConnections"
-                                                        value={config.Simulation.maxConcurrentTwinUpdates}
+                                                        value={config.simulation.maxConcurrentTwinUpdates}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -463,7 +514,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="maxConcurrentRegistrations"
-                                                        value={config.Simulation.maxConcurrentRegistrations}
+                                                        value={config.simulation.maxConcurrentRegistrations}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -489,7 +540,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="maxConcurrentDeletes"
-                                                        value={config.Simulation.maxConcurrentDeletes}
+                                                        value={config.simulation.maxConcurrentDeletes}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -515,7 +566,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="maxRegistrationAttempts"
-                                                        value={config.Simulation.maxRegistrationAttempts}
+                                                        value={config.simulation.maxRegistrationAttempts}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -538,7 +589,7 @@ const SettingsPage = () => {
                                                     <Form.Checkbox
                                                         name="enableTelemetry"
                                                         label="Send Telemetry"
-                                                        checked={config.Simulation.enableTelemetry}
+                                                        checked={config.simulation.enableTelemetry}
                                                         onChange={changeSimCheckHandler}
                                                     />
                                                 </Grid.Col>
@@ -557,7 +608,7 @@ const SettingsPage = () => {
                                                     <Form.Checkbox
                                                         name="enableReportedProps"
                                                         label="Send Reported Properties"
-                                                        checked={config.Simulation.enableReportedProps}
+                                                        checked={config.simulation.enableReportedProps}
                                                         onChange={changeSimCheckHandler}
                                                     />
                                                 </Grid.Col>
@@ -576,7 +627,7 @@ const SettingsPage = () => {
                                                     <Form.Checkbox
                                                         name="enableTwinUpdateAcks"
                                                         label="Send Desired Property Acknowledgements"
-                                                        checked={config.Simulation.enableTwinUpdateAcks}
+                                                        checked={config.simulation.enableTwinUpdateAcks}
                                                         onChange={changeSimCheckHandler}
                                                     />
                                                 </Grid.Col>
@@ -595,7 +646,7 @@ const SettingsPage = () => {
                                                     <Form.Checkbox
                                                         name="enableCommandAcks"
                                                         label="Send Command Acknowedgements"
-                                                        checked={config.Simulation.enableCommandAcks}
+                                                        checked={config.simulation.enableCommandAcks}
                                                         onChange={changeSimCheckHandler}
                                                     />
                                                 </Grid.Col>
@@ -608,12 +659,11 @@ const SettingsPage = () => {
                                                 </Grid.Col>
                                             </Grid.Row>
                                         </Form.Group>
-
                                     </Grid.Col>
                                     <Grid.Col>
-                                        <p>
-                                            <Text className="text-default small"><Icon prefix="fe" name="alert-triangle" />{" "} Restart Starling to apply these changes.</Text>
-                                        </p>
+                                        <h6>
+                                            <Text className="text-default small"><strong><Icon prefix="fe" name="alert-triangle" />{" "} Restart Starling to apply these changes.</strong></Text>
+                                        </h6>
                                         <h4>HTTP Settings</h4>
                                         <Form.Group
                                             isRequired
@@ -623,7 +673,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="adminPort"
-                                                        value={config.HTTP.adminPort}
+                                                        value={config.http.adminPort}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -648,12 +698,12 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="metricsPort"
-                                                        value={config.HTTP.metricsPort}
+                                                        value={config.http.metricsPort}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
                                                         onChange={changeHttpNumberHandler}
-                                                        invalid={errors.adminPort ? true : false}
+                                                        invalid={errors.metricsPort ? true : false}
                                                         feedback="Metrics Port Number (whole number) is required"
                                                     />
                                                 </Grid.Col>
@@ -662,6 +712,56 @@ const SettingsPage = () => {
                                                     className="align-self-center"
                                                 >
                                                     <HelpPopup content={<>The port on which the Starling publishes Prometheus metrics.</>} />
+                                                </Grid.Col>
+                                            </Grid.Row>
+                                        </Form.Group>
+                                        <Form.Group
+                                            isRequired
+                                            label="Prometheus Port Number"
+                                        >
+                                            <Grid.Row gutters="xs">
+                                                <Grid.Col>
+                                                    <Form.Input
+                                                        name="prometheusPort"
+                                                        value={config.http.prometheusPort}
+                                                        required
+                                                        type="text"
+                                                        pattern="[0-9]*"
+                                                        onChange={changeHttpNumberHandler}
+                                                        invalid={errors.prometheusPort ? true : false}
+                                                        feedback="Prometheus Port Number (whole number) is required"
+                                                    />
+                                                </Grid.Col>
+                                                <Grid.Col
+                                                    auto
+                                                    className="align-self-center"
+                                                >
+                                                    <HelpPopup content={<>The port on which the Promethus server is listening.</>} />
+                                                </Grid.Col>
+                                            </Grid.Row>
+                                        </Form.Group>
+                                        <Form.Group
+                                            isRequired
+                                            label="Grafana Port Number"
+                                        >
+                                            <Grid.Row gutters="xs">
+                                                <Grid.Col>
+                                                    <Form.Input
+                                                        name="grafanaPort"
+                                                        value={config.http.grafanaPort}
+                                                        required
+                                                        type="text"
+                                                        pattern="[0-9]*"
+                                                        onChange={changeHttpNumberHandler}
+                                                        invalid={errors.grafanaPort ? true : false}
+                                                        feedback="Grafana Port Number (whole number) is required"
+                                                    />
+                                                </Grid.Col>
+                                                <Grid.Col
+                                                    auto
+                                                    className="align-self-center"
+                                                >
+                                                    <HelpPopup content={<>The port on which the Grafana dashboard server is listening.</>} />
                                                 </Grid.Col>
                                             </Grid.Row>
                                         </Form.Group>
@@ -675,7 +775,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="path"
-                                                        value={config.Data.path}
+                                                        value={config.data.path}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -705,7 +805,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Input
                                                         name="logsDir"
-                                                        value={config.Logger.logsDir}
+                                                        value={config.logger.logsDir}
                                                         required
                                                         type="text"
                                                         pattern="[0-9]*"
@@ -734,7 +834,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Select
                                                         name="logLevel"
-                                                        value={config.Logger.logLevel}
+                                                        value={config.logger.logLevel}
                                                         required
                                                         onChange={changeLogHandler}
                                                         invalid={errors.logLevel ? true : false}
@@ -768,7 +868,7 @@ const SettingsPage = () => {
                                                 <Grid.Col>
                                                     <Form.Textarea
                                                         name="geopointData"
-                                                        value={config.Simulation.geopointData}
+                                                        value={config.simulation.geopointData}
                                                         required
                                                         onChange={changeSimHandler}
                                                         className="geopointData"

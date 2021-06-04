@@ -1,10 +1,10 @@
 package serving
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/iot-for-all/starling/pkg/config"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -44,8 +44,8 @@ func webAPIUpdateConfig(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Printf("error reading current directory: %s\n", err)
 	}
-	configFileName := path.Join(exeDir, "starling.yaml")
-	content, err := yaml.Marshal(cfg)
+	configFileName := path.Join(exeDir, "starling.json")
+	content, err := json.MarshalIndent(cfg, "", "  ")
 	if handleError(err, w) {
 		return
 	}
@@ -56,5 +56,16 @@ func webAPIUpdateConfig(w http.ResponseWriter, r *http.Request) {
 
 	// write the config back to request
 	err = json.NewEncoder(w).Encode(globalConfig)
+	handleError(err, w)
+}
+
+// webAPIMetricsStatus gets the status of grafana and prometheus servers
+func webAPIMetricsStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	metricsStatus := controller.GetMetricsStatus(ctx)
+
+	// write the config back to request
+	err := json.NewEncoder(w).Encode(metricsStatus)
 	handleError(err, w)
 }

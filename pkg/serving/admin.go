@@ -88,6 +88,7 @@ func StartAdmin(globalCfg *config.GlobalConfig, ctrl *controlling.Controller) {
 
 	router.HandleFunc("/webapi/config", webAPIGetConfig).Methods(http.MethodGet)
 	router.HandleFunc("/webapi/config", webAPIUpdateConfig).Methods(http.MethodPut)
+	router.HandleFunc("/webapi/config/metricsStatus", webAPIMetricsStatus).Methods(http.MethodGet)
 
 	// Serve Starling UX
 	handler := http.FileServer(getFileSystem())
@@ -98,7 +99,7 @@ func StartAdmin(globalCfg *config.GlobalConfig, ctrl *controlling.Controller) {
 	//router.HandleFunc("/*", handler.ServeHTTP).Methods(http.MethodGet)
 
 	log.Info().Msgf("serving admin requests at http://localhost:%d/api", globalConfig.HTTP.AdminPort)
-	log.Info().Msgf("service starling ux at http://localhost:%d", globalConfig.HTTP.AdminPort)
+	log.Info().Msgf("serving UX at http://localhost:%d", globalConfig.HTTP.AdminPort)
 
 	// handle CORS
 	headersOK := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})

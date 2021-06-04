@@ -22,15 +22,26 @@ const ModelLandingPage = () => {
     const redir = modelCount > 0 ? `/model/${globalContext.models[0].id}` : "";
     //console.log("modelCount: ", modelCount);
 
+    const actions = [
+        {
+            actionName: "Add Device Model",
+            actionUrl: "/model/add?new",
+            actionIcon: "plus"
+        }];
+    if (globalContext.initialized && globalContext.apps.length > 0){
+        actions.push({
+            actionName: "Import Device Models",
+            actionUrl: "/model/add?import",
+            actionIcon: "download"
+        });
+    }
     return modelCount > 0 ? <Redirect to={redir} /> :
         <SiteWrapper>
             <Page.Content title="">
                 <NoDataFoundCard
                     message="Device models"
                     description="Device models will show up here. Simulated devices can be spun up based on these device models. Add a device model here."
-                    actionName="Add Device Model"
-                    actionUrl="/model/add?new"
-                    actionIcon="plus"
+                    actions={actions}
                     noDataImage="/images/emptyModels.svg"
                 />
             </Page.Content>

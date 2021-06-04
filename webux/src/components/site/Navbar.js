@@ -37,6 +37,13 @@ const navBarItems = [
         useExact: false,
     },
     {
+        value: "Metrics",
+        to: "/metrics",
+        LinkComponent: withRouter(NavLink),
+        icon: "trending-up",
+        useExact: false,
+    },
+    {
         value: "Settings",
         to: "/settings",
         LinkComponent: withRouter(NavLink),

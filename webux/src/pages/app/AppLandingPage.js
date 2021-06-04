@@ -21,15 +21,20 @@ const AppLandingPage = () => {
     const appCount = globalContext.apps ? globalContext.apps.length : 0;
     const redir = appCount > 0 ? `/app/${globalContext.apps[0].id}` : "";
 
+    const actions = [
+        {
+            actionName: "Add Application",
+            actionUrl: "/app/add?new",
+            actionIcon: "plus"
+        }
+    ];
     return appCount > 0 ? <Redirect to={redir} /> :
         <SiteWrapper>
             <Page.Content title="">
                 <NoDataFoundCard
                     message="IoT Central Applications"
                     description="IoT Central Applications will show up here. Simulated devices are created in these IoT Central applications."
-                    actionName="Add Application"
-                    actionUrl="/app/add?new"
-                    actionIcon="plus"
+                    actions={actions}
                     noDataImage="/images/emptyApps.svg"
                 />
             </Page.Content>

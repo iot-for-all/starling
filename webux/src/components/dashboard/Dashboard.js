@@ -13,8 +13,8 @@ import * as Utils from '../../utils/utils';
 import "./Dashboard.css";
 
 const Dashboard = () => {
-    const globalContext = useContext(GlobalContext)
-    const [backendError, setBackendError] = useState()
+    const globalContext = useContext(GlobalContext);
+    const [backendError, setBackendError] = useState("");
 
     useEffect(() => {
         let timer = setInterval(() => {
@@ -82,14 +82,15 @@ const Dashboard = () => {
     const simCount = Utils.formatCount(sims, "simulation");
     return (
         <Page.Content title="Dashboard">
-            {backendError && backendError.length > 0 &&
+            {
+                backendError.length > 0 &&
                 <div className="alert alert-danger">
                     <Icon prefix="fe" name="alert-triangle" />{" "}
                     {backendError}
                 </div>
             }
             {
-                backendError && backendError.length === 0 &&
+                backendError.length === 0 &&
                 <Toolbar countMessage={simCount}>
                     <span title="Create a new simulation">
                         <Link

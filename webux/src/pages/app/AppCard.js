@@ -362,7 +362,7 @@ const AppCard = (props) => {
                                 <Grid.Col>
                                     <Form.Checkbox
                                         name="importModels"
-                                        label="Automatically import all device models for this application"
+                                        label="Automatically import all device models from this application"
                                         checked={app.importModels}
                                         onChange={changeCheckHandler}
                                     />
@@ -371,8 +371,8 @@ const AppCard = (props) => {
                                     auto
                                     className="align-self-center"
                                 >
-                                    <HelpPopup content={<><p>After adding the application, import all device models in the application.</p>
-                                                You can always import them after adding the application too.</>} />
+                                    <HelpPopup content={<><p>After adding the application, import all device models from the application.</p>
+                                                You can always import them after adding the application.</>} />
                                 </Grid.Col>
                             </Grid.Row>
                         </Form.Group>

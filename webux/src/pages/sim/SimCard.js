@@ -339,7 +339,7 @@ const SimCard = (props) => {
                         </Grid.Col>
                         <Grid.Col>
                             <div className="simLearnMore">
-                                <Text className="text-default"><Icon prefix="fe" name="help-circle" />{" "} <a href="https://github.com/iot-for-all/starling/blob/main/docs/configure.md#configuring-simulation" target="_blank" rel="noreferrer">Help me configure this simulation</a></Text>
+                                <Text className="text-default"><Icon prefix="fe" name="help-circle" />{" "} <a href="https://github.com/iot-for-all/starling/blob/main/docs/configure.md#configuring-and-running-simulations" target="_blank" rel="noreferrer">Help me configure this simulation</a></Text>
                             </div>
                         </Grid.Col>
                     </Grid.Row>

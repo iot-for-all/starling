@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // webAPIListDeviceModels lists all models.
@@ -43,6 +44,14 @@ func webAPIAddDeviceModel(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(req, &model)
 	if handleError(err, w) {
 		return
+	}
+
+	// generate ID if needed
+	if len(model.ID) == 0 {
+		model.ID, err = generateModelID(model.Name)
+		if handleError(err, w) {
+			return
+		}
 	}
 
 	dm, err := storing.DeviceModels.Get(model.ID)
@@ -128,5 +137,38 @@ func webAPIDeleteDeviceModel(w http.ResponseWriter, r *http.Request) {
 		if handleError(err, w) {
 			return
 		}
+	}
+}
+
+func generateModelID(name string) (string, error) {
+	name = strings.ToLower(name)
+	allowedChars := "abcdefghijklmnopqrstuvwxyz0123456789"
+	id := ""
+	for _, ch := range name {
+		char := string(ch)
+		if strings.Index(allowedChars, char) >= 0 {
+			id += char
+		}
+	}
+	if len(id) == 0 {
+		id = "model"
+	}
+
+	count := 0
+	newId := id
+	for {
+		// check to see if there are existing models with same id
+		model, err := storing.DeviceModels.Get(newId)
+		if err != nil {
+			return id, err
+		}
+
+		if model == nil {
+			// no model exists with that id, it is good to use
+			return newId, nil
+		}
+
+		count++
+		newId = fmt.Sprintf("%s%d", id, count)
 	}
 }

@@ -3,7 +3,6 @@ import { useHistory } from "react-router-dom";
 import {
     Button,
     Card,
-    Grid,
     Header,
     Icon,
     Page,
@@ -24,16 +23,10 @@ const MetricsPage = () => {
 
     // Called on mount to ensure reference data is loaded if coming from shortcut
     useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
-
         if (globalContext.metricsStatus) {
             setStatus(globalContext.metricsStatus);
             setBackendError("");
         }
-        // ignore global context dependency error
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [globalContext.metricsStatus])
 
     const onSubmit = async (event) => {
@@ -79,7 +72,7 @@ const MetricsPage = () => {
         </div>;
     } else {
         prometheusLink = <div>
-            <Icon prefix="fe" name="external-link" />{" "}<a href="https://github.com/iot-for-all/starling/blob/main/README.md" target="_blank" rel="noreferrer">Help me configure</a>
+            <Icon prefix="fe" name="external-link" />{" "}<a href="https://github.com/iot-for-all/starling/docs/metrics.md#prometheus" target="_blank" rel="noreferrer">Help me configure</a>
         </div>;
     }
 
@@ -93,7 +86,7 @@ const MetricsPage = () => {
         </div>;
     } else {
         grafanaLink = <div>
-            <Icon prefix="fe" name="external-link" />{" "}<a href="https://github.com/iot-for-all/starling/blob/main/README.md" target="_blank" rel="noreferrer">Help me configure</a>
+            <Icon prefix="fe" name="external-link" />{" "}<a href="https://github.com/iot-for-all/starling/docs/metrics.md#grafana" target="_blank" rel="noreferrer">Help me configure</a>
         </div>;
     }
 
@@ -121,10 +114,10 @@ const MetricsPage = () => {
                     </Card.Header>
                     <Card.Body>
                         <div className="simLearnMore">
-                            <p>
-                                <Text className="text-default"><Icon prefix="fe" name="help-circle" />{" "} <a href="https://github.com/iot-for-all/starling" target="_blank" rel="noreferrer">Help me configure metrics pipeline</a></Text>
-                            </p>
+                            <Text className="text-default"><Icon prefix="fe" name="help-circle" />{" "} <a href="https://github.com/iot-for-all/starling" target="_blank" rel="noreferrer">Help me configure metrics pipeline</a></Text>
                         </div>
+                        <p>
+                        </p>
                         <p>
                             Starling publishes metrics through its metrics endpoint.
                             You can configure Prometheus to scrape these metrics and store in its timeseries database.
@@ -144,7 +137,7 @@ const MetricsPage = () => {
                                 <div>
                                     <Text className="arrowText">Prometheus scrapes data from Starling</Text>
                                 </div>
-                                <span class="arrow-right"></span>
+                                <span className="arrow-right"></span>
                             </div>
                             <div className="serverCardItem">
                                 <Card className="serverCard">
@@ -159,7 +152,7 @@ const MetricsPage = () => {
                                 <div>
                                     <Text className="arrowText">Grafana queries data from Prometheus</Text>
                                 </div>
-                                <span class="arrow-right"></span>
+                                <span className="arrow-right"></span>
                             </div>
                             <div className="serverCardItem">
                                 <Card className="serverCard">

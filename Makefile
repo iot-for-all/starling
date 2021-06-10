@@ -2,6 +2,7 @@ EXECUTABLE=./bin/starling
 WINDOWS=$(EXECUTABLE)_windows_amd64.exe
 LINUX=$(EXECUTABLE)_linux_amd64
 DARWIN=$(EXECUTABLE)_darwin_amd64
+PI=$(EXECUTABLE)_linux_arm64
 WEBUX=./webux
 STATIC_CONTENT=./pkg/serving/static
 
@@ -11,7 +12,7 @@ STATIC_CONTENT=./pkg/serving/static
 all: build						## Build for all platforms
 
 # build binaries
-build: windows linux darwin		## Build binaries for all platforms
+build: windows linux pi darwin		## Build binaries for all platforms
 
 ux:								## Build React UX
 	cd $(WEBUX) && yarn install && yarn build
@@ -19,18 +20,21 @@ ux:								## Build React UX
 	mkdir $(STATIC_CONTENT)
 	mv $(WEBUX)/build/* $(STATIC_CONTENT)
 
-windows:						## Build for Windows
+windows:						## Build for Windows (AMD 64bit)
 	env GOOS=windows GOARCH=amd64 go build -v -o $(WINDOWS)
 
-linux:							## Build for Linux
+linux:							## Build for Linux (AMD 64bit)
 	env GOOS=linux GOARCH=amd64 go build -v -o $(LINUX)
+
+pi:							## Build for Raspberry Pi (ARM 64 bit)
+	env GOOS=linux GOARCH=arm64 go build -v -o $(PI)
 
 darwin:							## Build for Darwin (macOS)
 	env GOOS=darwin GOARCH=amd64 go build -v -o $(DARWIN)
 
 clean:							## Remove previous build
 	go clean
-	rm -f $(WINDOWS_EXECUTABLE) $(LINUX_EXECUTABLE) $(DARWIN_EXECUTABLE)
+	rm -f $(WINDOWS) $(LINUX) $(PI) $(DARWIN)
 	rm -rf $(WEBUX)/build
 
 help: 							## Display available commands

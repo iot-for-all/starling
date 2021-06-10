@@ -16,7 +16,6 @@ import * as Utils from "../../utils/utils";
 
 const ModelPage = () => {
     const globalContext = useContext(GlobalContext)
-
     const params = useParams();
     const queryParams = new URLSearchParams(useLocation().search);
     const [model, setModel] = useState();
@@ -26,20 +25,8 @@ const ModelPage = () => {
     const pageMode = (queryParams.has("new") || queryParams.has("import")) ? "add" : "edit";
     const isImportMode = (queryParams.has("import"));
 
-    // Called on mount to ensure reference data is loaded if coming from shortcut
-    useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
-
-        //console.log("in global useeffect, id: ", id);
-    }, [globalContext])
-
     // Only called if a new mount or id has changed
     useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
         //console.log("ModelPage - useeffect, id: ", id);
         if (pageMode === 'add') {
             setModel({ id: '', name: '', capabilityModel: [] });

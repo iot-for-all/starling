@@ -24,21 +24,8 @@ const AppPage = () => {
     const history = useHistory();
     const pageMode = (queryParams.has("new")) ? "add" : "edit";
 
-    // Called on mount to ensure reference data is loaded if coming from shortcut
-    useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
-
-        //console.log("in global useeffect, id: ", id);
-    }, [globalContext])
-
     // Only called if a new mount or id has changed
     useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
-
         if (pageMode === 'add') {
             setApp({ id: '', name: '', provisioningUrl: 'global.azure-devices-provisioning.net', idScope: '', masterKey: '', appUrl: '', appToken: '', importModels: true });
         } else {

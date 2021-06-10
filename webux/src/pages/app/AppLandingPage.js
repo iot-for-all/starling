@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import {
     Page
 } from "tabler-react";
@@ -10,14 +10,6 @@ import NoDataFoundCard from '../../components/nodata/NoDataFoundCard';
 
 const AppLandingPage = () => {
     const globalContext = useContext(GlobalContext)
-
-    // Called on mount to ensure reference data is loaded if coming from shortcut
-    useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
-    }, [globalContext])
-
     const appCount = globalContext.apps ? globalContext.apps.length : 0;
     const redir = appCount > 0 ? `/app/${globalContext.apps[0].id}` : "";
 

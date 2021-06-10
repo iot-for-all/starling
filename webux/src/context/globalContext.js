@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const GlobalContext = React.createContext({
@@ -31,7 +31,7 @@ const GlobalContext = React.createContext({
     provisionSimulationDevices: (simId, payload) => { },
     getConfig: () => { },
     updateConfig: (payload) => { },
-    refreshMetricsStatus: () => {},
+    refreshMetricsStatus: () => { },
 });
 
 export const GlobalContextProvider = (props) => {
@@ -43,23 +43,29 @@ export const GlobalContextProvider = (props) => {
     const [metricsStatus, setMetricsStatus] = useState();
     const BASE_URL = (process.env.NODE_ENV !== "production") ? "http://localhost:6001/webapi" : "/webapi";
 
-    const initializeData = async () => {
-        //try {
-            const remoteApps = await axios.get(`${BASE_URL}/target`);
-            const remoteModels = await axios.get(`${BASE_URL}/model`);
-            const remoteSimulations = await axios.get(`${BASE_URL}/simulation`);
-            const remoteConfig = await axios.get(`${BASE_URL}/config`);
-            const remoteMetricsStatus = await axios.get(`${BASE_URL}/config/metricsStatus`);
-            setApps(remoteApps.data);
-            setModels(remoteModels.data);
-            setSimulations(remoteSimulations.data);
-            setConfig(remoteConfig.data);
-            setMetricsStatus(remoteMetricsStatus.data);
-            setInitialized(true);
-        /*} catch (err) {
-            console.log(err);
-        }*/
+    const initializeData = () => {
     }
+
+    useEffect(() => {
+        const initData = async () => {
+            if (!initialized) {
+                const remoteApps = await axios.get(`${BASE_URL}/target`);
+                const remoteModels = await axios.get(`${BASE_URL}/model`);
+                const remoteSimulations = await axios.get(`${BASE_URL}/simulation`);
+                const remoteConfig = await axios.get(`${BASE_URL}/config`);
+                const remoteMetricsStatus = await axios.get(`${BASE_URL}/config/metricsStatus`);
+                setApps(remoteApps.data);
+                setModels(remoteModels.data);
+                setSimulations(remoteSimulations.data);
+                setConfig(remoteConfig.data);
+                setMetricsStatus(remoteMetricsStatus.data);
+                setInitialized(true);
+            }
+        }
+        initData();
+    }, [initialized, BASE_URL])
+
+
 
     const getApplication = (appId) => {
         return apps.find((x) => x.id === appId);
@@ -72,9 +78,10 @@ export const GlobalContextProvider = (props) => {
     }
 
     const addApplication = async (payload) => {
-        await axios.post(`${BASE_URL}/target`, payload);
+        const res = await axios.post(`${BASE_URL}/target`, payload);
         await listApplications();
         await listModels();
+        return res.data;
     }
 
     const updateApplication = async (payload) => {
@@ -100,9 +107,10 @@ export const GlobalContextProvider = (props) => {
     }
 
     const addModel = async (payload) => {
-        await axios.post(`${BASE_URL}/model`, payload);
+        const res = await axios.post(`${BASE_URL}/model`, payload);
         await listModels();
         await listSimulations();
+        return res.data;
     }
 
     const updateModel = async (payload) => {
@@ -134,8 +142,9 @@ export const GlobalContextProvider = (props) => {
     }
 
     const addSimulation = async (payload) => {
-        await axios.post(`${BASE_URL}/simulation`, payload);
+        const res = await axios.post(`${BASE_URL}/simulation`, payload);
         await listSimulations();
+        return res.data;
     }
 
     const updateSimulation = async (payload) => {
@@ -225,7 +234,9 @@ export const GlobalContextProvider = (props) => {
                 refreshMetricsStatus: refreshMetricsStatus,
             }}
         >
-            {props.children}
+            {
+                initialized ? props.children : "loading..."
+            }
         </GlobalContext.Provider>
     );
 };

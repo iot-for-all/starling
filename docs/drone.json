@@ -1,0 +1,118 @@
+[
+  {
+    "@id": "dtmi:parnellAerospace:DJIMavicAir2;1",
+    "@type": "Interface",
+    "contents": [
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:speed;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "Speed"
+        },
+        "name": "speed",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:altitude;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "Altitude"
+        },
+        "name": "altitude",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:datetime;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "MsgDateTime"
+        },
+        "name": "datetime",
+        "schema": "dateTime"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:rotorspeed;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "RotorSpeed"
+        },
+        "name": "rotorspeed",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:batterylevel;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "BatteryLevel"
+        },
+        "name": "batterylevel",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:land;1",
+        "@type": "Command",
+        "commandType": "synchronous",
+        "displayName": {
+          "en": "Land"
+        },
+        "name": "land"
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:firmwareversion;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Firmware Version"
+        },
+        "name": "firmwareversion",
+        "schema": "string",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:firmwarelocation;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Firmware Location"
+        },
+        "name": "firmwarelocation",
+        "schema": "string",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:serialnumber;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Serial Number"
+        },
+        "name": "serialnumber",
+        "schema": "string",
+        "writable": false
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:manufacturer;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Manufacturer"
+        },
+        "name": "manufacturer",
+        "schema": "string",
+        "writable": false
+      },
+      {
+        "@id": "dtmi:parnellAerospace:DJIMavicAir2:Location;1",
+        "@type": "Telemetry",
+        "displayName": {
+          "en": "Location"
+        },
+        "name": "Location",
+        "schema": "geopoint"
+      }
+    ],
+    "displayName": {
+      "en": "DJI Mavic Air 2"
+    },
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ]
+  }
+]

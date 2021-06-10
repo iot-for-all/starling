@@ -46,24 +46,13 @@ const AppCard = (props) => {
         setApp(updatedApp);
         //console.log("value changed target: ", event.target, " value: ", event.target.value, ", updatedApp: ", updatedApp);
     }
-    const changeIDHandler = (event) => {
-        let updatedApp = {
-            ...app,
-            [event.target.name]: event.target.value.toLowerCase()
-        }
-        setApp(updatedApp);
-    }
-
+    
     const onSubmit = async (event) => {
         event.preventDefault();
 
         // validate form
         let newErrors = {};
         let hasErrors = false;
-        if (app.id.trim() === "" || !app.id.match(/^[0-9a-z]+$/)) {
-            newErrors.id = true;
-            hasErrors = true;
-        }
         if (app.name.trim() === "") {
             newErrors.name = true;
             hasErrors = true;
@@ -97,8 +86,10 @@ const AppCard = (props) => {
                 const updatedApp = {
                     ...app
                 };
+                let appId = app.id;
                 if (props.mode === "add") {
-                    await globalContext.addApplication(updatedApp);
+                    const addedApp = await globalContext.addApplication(updatedApp);
+                    appId = addedApp.id;
                     Notification.addNotification("success", "Success", `Application '${updatedApp.name}' is added.`);
                 } else {
                     await globalContext.updateApplication(updatedApp);
@@ -108,7 +99,7 @@ const AppCard = (props) => {
                 if (fromIntro) {
                     history.push("/");
                 } else {
-                    history.push(`/app/${app.id}`);
+                    history.push(`/app/${appId}`);
                 }
             } catch (ex) {
                 setBackendError(Utils.getErrorMessage(ex, "error saving application"));
@@ -186,31 +177,6 @@ const AppCard = (props) => {
                         enter these details so that the devices can be provisioned using the credentials given below.
                         Multiple simulations can be created against an application and executed simultaneously.
                     </p>
-                    <Form.Group
-                        isRequired
-                        label="Application ID (E.g: app1)"
-                    >
-                        <Grid.Row gutters="xs">
-                            <Grid.Col>
-                                <Form.Input
-                                    name="id"
-                                    value={app.id}
-                                    onChange={changeIDHandler}
-                                    disabled={props.mode !== "add"}
-                                    invalid={errors.id ? true : false}
-                                    feedback="Application ID is required (only lowercase alphanumeric characters are allowed)"
-                                />
-                            </Grid.Col>
-                            <Grid.Col
-                                auto
-                                className="align-self-center"
-                            >
-                                <HelpPopup content={<>
-                                    <p>Unique ID for the application. Only lowecase alphanumeric characters are allowed. E.g.: <strong>app1</strong></p>
-                                    <p>Devices in a simulation are named SimID-AppID-ModelID-###.</p>Choose this ID wisely.</>} />
-                            </Grid.Col>
-                        </Grid.Row>
-                    </Form.Group>
                     <Form.Group
                         isRequired
                         label="Application Name"
@@ -396,7 +362,7 @@ const AppCard = (props) => {
                                 <Grid.Col>
                                     <Form.Checkbox
                                         name="importModels"
-                                        label="Automatically import all Device Models for this application"
+                                        label="Automatically import all device models for this application"
                                         checked={app.importModels}
                                         onChange={changeCheckHandler}
                                     />

@@ -8,6 +8,7 @@
 .serverCard {
     margin-bottom: 0rem;
     height: 175px;
+    border-color: var(--gray);
 }
   
 
@@ -40,7 +41,7 @@
   display: inline-block !important;
   width: 0;
   height: 0;
-  border-left: 8px solid #495057;
+  border-left: 8px solid var(--dark);
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
   vertical-align: middle;
@@ -49,7 +50,7 @@
 .arrow-right:before {
   width: 150px;
   height: 2px;
-  background: #495057;
+  background: var(--dark);
   content: "";
   display: inline-block;
   vertical-align: middle;

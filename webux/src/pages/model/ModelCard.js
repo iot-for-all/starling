@@ -41,24 +41,12 @@ const ModelCard = (props) => {
         //console.log("value changed target: ", event.target, " value: ", event.target.value, ", updatedModel: ", updatedModel);
     }
 
-    const changeIDHandler = (event) => {
-        let updatedModel = {
-            ...model,
-            [event.target.name]: event.target.value.toLowerCase()
-        }
-        setModel(updatedModel);
-    }
-
     const onSubmit = async (event) => {
         event.preventDefault();
 
         // validate form
         let newErrors = {};
         let hasErrors = false;
-        if (model.id.trim() === "" || !model.id.match(/^[0-9a-z]+$/)) {
-            newErrors.id = true;
-            hasErrors = true;
-        }
         if (model.name.trim() === "") {
             newErrors.name = true;
             hasErrors = true;
@@ -76,8 +64,10 @@ const ModelCard = (props) => {
                     ...model,
                     capabilityModel: JSON.parse(model.capabilityModel)
                 };
+                let modelId = model.id;
                 if (props.mode === "add") {
-                    await globalContext.addModel(updatedModel);
+                    const addedModel = await globalContext.addModel(updatedModel);
+                    modelId = addedModel.id;
                     Notification.addNotification("success", "Success", `Device model '${updatedModel.name}' is added.`);
                 } else {
                     await globalContext.updateModel(updatedModel);
@@ -87,7 +77,7 @@ const ModelCard = (props) => {
                 if (fromIntro) {
                     history.push("/");
                 } else {
-                    history.push(`/model/${model.id}`);
+                    history.push(`/model/${modelId}`);
                 }
             } catch (ex) {
                 setBackendError(Utils.getErrorMessage(ex, "error saving model"));
@@ -153,31 +143,6 @@ const ModelCard = (props) => {
                         Same model can be used across multiple applications.
                         Make sure that this model exists in the IoT Central application before starting the simulation.
                     </p>
-                    <Form.Group
-                        isRequired
-                        label="Model ID"
-                    >
-                        <Grid.Row gutters="xs">
-                            <Grid.Col>
-                                <Form.Input
-                                    name="id"
-                                    value={model.id}
-                                    onChange={changeIDHandler}
-                                    disabled={props.mode !== "add"}
-                                    invalid={errors.id ? true : false}
-                                    feedback="Model ID is required (only alphanumeric characters are allowed)"
-                                />
-                            </Grid.Col>
-                            <Grid.Col
-                                auto
-                                className="align-self-center"
-                            >
-                                <HelpPopup content={<>
-                                    <p>Unique ID for the model. Only lowecase alphanumeric characters are allowed. E.g.: <strong>mymodel</strong></p>
-                                    <p>Devices in a simulation are named SimID-AppID-ModelID-###.</p>Choose this ID wisely.</>} />
-                            </Grid.Col>
-                        </Grid.Row>
-                    </Form.Group>
                     <Form.Group
                         isRequired
                         label="Model Name"

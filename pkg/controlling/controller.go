@@ -289,11 +289,11 @@ func (c *Controller) getServerStatus(ctx context.Context, name string, portNumbe
 	}
 
 	client := http.Client{
-		Timeout: time.Duration(10) * time.Second,
+		Timeout: time.Duration(100) * time.Millisecond,
 	}
 	_, err = client.Do(req)
 	if err != nil {
-		log.Err(err).Str("path", path).Msg("error getting Grafana server status request")
+		//log.Err(err).Str("path", path).Str("server", name).Msg("error getting server status")
 		return false
 	}
 	return true

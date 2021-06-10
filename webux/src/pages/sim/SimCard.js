@@ -58,14 +58,6 @@ const SimCard = (props) => {
         //console.log("value changed target: ", event.target, " value: ", event.target.value, ", updatedSim: ", updatedSim);
     }
 
-    const changeIDHandler = (event) => {
-        let updatedSim = {
-            ...sim,
-            [event.target.name]: event.target.value.toLowerCase()
-        }
-        setSim(updatedSim);
-    }
-
     const changeNumberHandler = (event) => {
         //console.log("value changed target: ", event.target, " value: ", event.target.value, " valid: ", event.target.validity.valid);
         if (event.target.value.match(/^[0-9]+$/) || event.target.value.trim().length === 0) {
@@ -101,10 +93,6 @@ const SimCard = (props) => {
         // validate form
         let newErrors = {};
         let hasErrors = false;
-        if (sim.id.trim() === "" || !sim.id.match(/^[0-9a-z]+$/)) {
-            newErrors.id = true;
-            hasErrors = true;
-        }
         if (sim.name.trim() === "") {
             newErrors.name = true;
             hasErrors = true;
@@ -167,8 +155,10 @@ const SimCard = (props) => {
                     updatedSim.devices[i].simulatedCount = +updatedSim.devices[i].simulatedCount;
                 }
 
+                let simId = sim.id;
                 if (props.mode === "add") {
-                    await globalContext.addSimulation(updatedSim);
+                    const addedSim = await globalContext.addSimulation(updatedSim);
+                    simId = addedSim.id;
                     Notification.addNotification("success", "Success", `Simulation '${updatedSim.name}' is added.`);
                 } else {
                     await globalContext.updateSimulation(updatedSim);
@@ -178,7 +168,7 @@ const SimCard = (props) => {
                 if (fromIntro) {
                     history.push("/");
                 } else {
-                    history.push(`/sim/${sim.id}`);
+                    history.push(`/sim/${simId}`);
                 }
             } catch (ex) {
                 setBackendError(Utils.getErrorMessage(ex, "error saving simulation"));
@@ -349,7 +339,7 @@ const SimCard = (props) => {
                         </Grid.Col>
                         <Grid.Col>
                             <div className="simLearnMore">
-                                <a href="https://github.com/iot-for-all/starling" target="_blank" rel="noreferrer">Help me configure this simulation</a>
+                                <a href="https://github.com/iot-for-all/starling/docs/configure.md#configure-simulation" target="_blank" rel="noreferrer">Help me configure this simulation</a>
                             </div>
                         </Grid.Col>
                     </Grid.Row>
@@ -357,32 +347,6 @@ const SimCard = (props) => {
                         <Grid.Row>
                             <Grid.Col>
                                 <h4>Base Configuration</h4>
-                                <Form.Group
-                                    isRequired
-                                    label="Simulation ID (E.g.: sim1)"
-                                >
-                                    <Grid.Row gutters="xs">
-                                        <Grid.Col>
-                                            <Form.Input
-                                                name="id"
-                                                value={sim.id}
-                                                type="text"
-                                                onChange={changeIDHandler}
-                                                disabled={props.mode !== "add"}
-                                                invalid={errors.id ? true : false}
-                                                feedback="Simulation ID is required (only lowercase alphanumeric characters are allowed)"
-                                            />
-                                        </Grid.Col>
-                                        <Grid.Col
-                                            auto
-                                            className="align-self-center"
-                                        >
-                                            <HelpPopup content={<>
-                                                <p>Unique ID for the simulation. Only lowecase alphanumeric characters are allowed. E.g.: <strong>sim1</strong></p>
-                                                <p>Devices in a simulation are named SimID-AppID-ModelID-###.</p>Choose this ID wisely.</>} />
-                                        </Grid.Col>
-                                    </Grid.Row>
-                                </Form.Group>
                                 <Form.Group
                                     isRequired
                                     label="Simulation Name"

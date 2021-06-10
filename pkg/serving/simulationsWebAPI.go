@@ -180,6 +180,14 @@ func webAPIAddSimulation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// generate ID if needed
+	if len(simView.ID) == 0 {
+		simView.ID, err = generateSimulationID(simView.Name)
+		if handleError(err, w) {
+			return
+		}
+	}
+
 	// check to see if there is an existing sim with same ID
 	existingSim, err := storing.Simulations.Get(simView.ID)
 	if handleError(err, w) {
@@ -568,5 +576,38 @@ func provisionDevicesInternal(sim *models.Simulation, target *models.SimulationT
 	if err := storing.Simulations.Set(sim); err != nil {
 		log.Error().Err(err).Str("simID", sim.ID).Msg("error updating simulation to ready status")
 		return
+	}
+}
+
+func generateSimulationID(name string) (string, error) {
+	name = strings.ToLower(name)
+	allowedChars := "abcdefghijklmnopqrstuvwxyz0123456789"
+	id := ""
+	for _, ch := range name {
+		char := string(ch)
+		if strings.Index(allowedChars, char) >= 0 {
+			id += char
+		}
+	}
+	if len(id) == 0 {
+		id = "sim"
+	}
+
+	count := 0
+	newId := id
+	for {
+		// check to see if there are existing simulations with same id
+		sim, err := storing.Simulations.Get(newId)
+		if err != nil {
+			return id, err
+		}
+
+		if sim == nil {
+			// no simulation exists with that id, it is good to use
+			return newId, nil
+		}
+
+		count++
+		newId = fmt.Sprintf("%s%d", id, count)
 	}
 }

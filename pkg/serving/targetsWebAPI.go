@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // webAPIListTargets lists all targets.
@@ -47,6 +48,14 @@ func webAPIAddTarget(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(req, &tv)
 	if handleError(err, w) {
 		return
+	}
+
+	// generate ID if needed
+	if len(t.ID) == 0 {
+		t.ID, err = generateTargetID(t.Name)
+		if handleError(err, w) {
+			return
+		}
 	}
 
 	// check to see if there are existing targets with same id
@@ -154,5 +163,37 @@ func webAPIImportModelsFromTarget(w http.ResponseWriter, r *http.Request) {
 		if handleError(err, w) {
 			return
 		}
+	}
+}
+
+func generateTargetID(name string) (string, error) {
+	name = strings.ToLower(name)
+	allowedChars := "abcdefghijklmnopqrstuvwxyz0123456789"
+	id := ""
+	for _, ch := range name {
+		char := string(ch)
+		if strings.Index(allowedChars, char) >= 0 {
+			id += char
+		}
+	}
+	if len(id) == 0 {
+		id = "app"
+	}
+	count := 0
+	newId := id
+	for {
+		// check to see if there are existing targets with same id
+		target, err := storing.Targets.Get(newId)
+		if err != nil {
+			return id, err
+		}
+
+		if target == nil {
+			// no target exists with that id, it is good to use
+			return newId, nil
+		}
+
+		count++
+		newId = fmt.Sprintf("%s%d", id, count)
 	}
 }

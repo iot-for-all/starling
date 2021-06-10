@@ -91,12 +91,15 @@ func StartAdmin(globalCfg *config.GlobalConfig, ctrl *controlling.Controller) {
 	router.HandleFunc("/webapi/config/metricsStatus", webAPIMetricsStatus).Methods(http.MethodGet)
 
 	// Serve Starling UX
-	handler := http.FileServer(getFileSystem())
-	router.PathPrefix("/").Handler(http.StripPrefix("/", handler))
-	//router.PathPrefix("/sim").Handler(http.StripPrefix("/sim", handler))
-	//handler := AssetHandler("/", "static")
-	//router.HandleFunc("/", handler.ServeHTTP).Methods(http.MethodGet)
-	//router.HandleFunc("/*", handler.ServeHTTP).Methods(http.MethodGet)
+
+	// default file handler does not fall back to index.html for custom routes in UX
+	//handler := http.FileServer(getFileSystem())
+	//router.PathPrefix("/").Handler(http.StripPrefix("/", handler))
+
+	// UX uses custom routes. If a route is fetched, there is no corresponding file in the SPA.
+	// In those cases, fall back to index.html to deal with the routes.
+	handler := AssetHandler("/", "static")
+	router.PathPrefix("/").Handler(handler)
 
 	log.Info().Msgf("serving admin requests at http://localhost:%d/api", globalConfig.HTTP.AdminPort)
 	log.Info().Msgf("serving UX at http://localhost:%d", globalConfig.HTTP.AdminPort)
@@ -118,33 +121,32 @@ func getFileSystem() http.FileSystem {
 	return http.FS(fileSystem)
 }
 
-// fsFunc is short-hand for constructing a http.FileSystem
-// implementation
+// fsFunc is short-hand for constructing a http.FileSystem implementation
 type fsFunc func(name string) (fs.File, error)
 
 func (f fsFunc) Open(name string) (fs.File, error) {
 	return f(name)
 }
 
-// AssetHandler returns an http.Handler that will serve files from
-// the Assets embed.FS.  When locating a file, it will strip the given
-// prefix from the request and prepend the root to the filesystem
-// lookup: typical prefix might be /web/, and root would be build.
+// AssetHandler returns an http.Handler that will serve files from the Assets embed.FS.
 func AssetHandler(prefix, root string) http.Handler {
 	handler := fsFunc(func(name string) (fs.File, error) {
 		assetPath := path.Join(root, name)
 
-		log.Debug().Str("assetPath", assetPath).Msg("got request")
-		// If we can't find the asset, return the default index.html
-		// content
+		//log.Trace().Str("assetPath", assetPath).Msg("got request")
+		// If we can't find the asset, return the default index.html content and let it deal with the UX routes
 		f, err := embeddedFiles.Open(assetPath)
 		if os.IsNotExist(err) {
-			log.Debug().Str("assetPath", assetPath).Msg("got request redirected to index.html")
-			return embeddedFiles.Open("index.html")
+			log.Trace().Str("assetPath", assetPath).Msg("file not found, redirected to index.html")
+			f, err = embeddedFiles.Open("static/index.html")
+			if err != nil {
+				log.Error().Err(err).Str("assetPath", assetPath).Msg("could not find index.html")
+			}
+		} else {
+			log.Trace().Str("assetPath", assetPath).Msg("serving file")
 		}
 
-		// Otherwise assume this is a legitimate request routed
-		// correctly
+		// Otherwise assume this is a legitimate request routed correctly
 		return f, err
 	})
 

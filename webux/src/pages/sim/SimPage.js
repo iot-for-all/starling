@@ -27,19 +27,9 @@ const SimPage = () => {
     const isProvisionMode = (queryParams.has("provision"));
 
     // Called on mount to ensure reference data is loaded if coming from shortcut
-    useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
-
-        //console.log("in global useeffect, id: ", id);
-    }, [globalContext])
-
+    
     // Only called if a new mount or id has changed
     useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
         if (pageMode === 'add') {
             let devices = [];
             for (let i = 0; i < globalContext.models.length; i++) {
@@ -77,11 +67,9 @@ const SimPage = () => {
 
         // ignore global context dependency error
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [globalContext.simulations, id])
+    }, [globalContext.simulations, globalContext.initialized, id])
 
     const simCount = Utils.formatCount(globalContext.simulations, "simulation");
-
-    //const pageMode = (id && id !== "new" ? "edit" : "add");
 
     // simId passed in url is invalid or does not exist
     if (!globalContext.models || globalContext.models.length === 0

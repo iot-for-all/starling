@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import {
     Page
 } from "tabler-react";
@@ -10,14 +10,6 @@ import NoDataFoundCard from '../../components/nodata/NoDataFoundCard';
 
 const ModelLandingPage = () => {
     const globalContext = useContext(GlobalContext)
-
-    // Called on mount to ensure reference data is loaded if coming from shortcut
-    useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
-    }, [globalContext])
-
     const modelCount = globalContext.models ? globalContext.models.length : 0;
     const redir = modelCount > 0 ? `/model/${globalContext.models[0].id}` : "";
     //console.log("modelCount: ", modelCount);

@@ -30,10 +30,6 @@ const SettingsPage = () => {
 
     // Called on mount to ensure reference data is loaded if coming from shortcut
     useEffect(() => {
-        if (!globalContext.initialized) {
-            globalContext.initializeData();
-        }
-
         if (globalContext.config) {
             // deep copy the config object so that the original config containing geopoint array
             // does not get changed as we are converting it into string locally
@@ -135,6 +131,7 @@ const SettingsPage = () => {
         setAppWarning(true);
         setSaved(false);
     }
+    
     // need to change this
     const changeSimulationNumberHandler = (event) => {
         //console.log("value changed target: ", event.target, " value: ", event.target.value, " valid: ", event.target.validity.valid);

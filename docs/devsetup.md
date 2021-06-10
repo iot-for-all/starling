@@ -30,5 +30,5 @@ However if you want to modify the UX, you need to install the following:
 - [NodeJS](https://nodejs.org/en/download/)
 - [Yarn](https://yarnpkg.com/getting-started/install)
 
-[Back to contents](../Readme.md) | Next: [Building](build.md)
+[Back to contents](../README.md) | Next: [Building](build.md)
 ---------------------------------|---------------------------

@@ -1,4 +1,4 @@
-import {Fragment} from  "react";
+import { Fragment } from "react";
 import {
     Container,
     Grid,
@@ -17,20 +17,24 @@ const PageFooter = (props) => {
                                     <List className="list-inline list-inline-dots mb-0">
                                         <List.Item className="list-inline-item">
                                             <a
-                                                href="https://github.com/iot-for-all/starling/readme.md"
+                                                href="https://github.com/iot-for-all/starling/blob/main/README.md"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >Documentation</a>
                                         </List.Item>
                                         <List.Item className="list-inline-item">
                                             <a
-                                                href="https://github.com/iot-for-all/starling/docs/faq.md"
+                                                href="https://github.com/iot-for-all/starling/blob/main/docs/faq.md"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >FAQ</a>
                                         </List.Item>
                                         <List.Item className="list-inline-item">
-                                            <a href="https://github.com/iot-for-all/starling/issues">Issues</a>
+                                            <a href="https://github.com/iot-for-all/starling/issues"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+
+                                            >Issues</a>
                                         </List.Item>
                                     </List>
                                 </Grid.Col>

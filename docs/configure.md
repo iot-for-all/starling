@@ -65,5 +65,5 @@ Telemetry Format           | Default (JSON)   | Device sends standard JSON adher
 ![picture alt](assets/ux-simconfig-complex.png "Complex Simulation configuration")
 
 
-[Back to contents](../Readme.md)| Previous: [Running server](running.md) | Next: [Setting up metrics collection and dashboards](metrics.md)
+[Back to contents](../README.md)| Previous: [Running server](running.md) | Next: [Setting up metrics collection and dashboards](metrics.md)
 ---------------------------------|-------------------------------------------------------|------------------------------------

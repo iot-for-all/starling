@@ -41,5 +41,5 @@ After building the code, it copies the built site into the [static](../pkg/servi
 #### Cleanup ####
 To clean up all the binaries, use `make clean`
 
-[Back to contents](../Readme.md)| Previous: [Development environment setup](devsetup.md) | Next: [Running server](running.md)
+[Back to contents](../README.md)| Previous: [Development environment setup](devsetup.md) | Next: [Running server](running.md)
 ---------------------------------|-------------------------------------------------------|------------------------------------

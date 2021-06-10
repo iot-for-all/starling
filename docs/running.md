@@ -19,5 +19,5 @@ So, create an IoT Central application and create your device templates.
 You can use one of the device model samples: [brewer.json](./brewer.json) or [drone.json](./drone.json) .
 After configuring the views, publish these device templates. Create an API Token with administrator role and copy it.
 
-[Back to contents](../Readme.md)| Previous: [Building binaries](build.md) | Next: [Configuring and running simulations](configure.md)
+[Back to contents](../README.md)| Previous: [Building binaries](build.md) | Next: [Configuring and running simulations](configure.md)
 ---------------------------------|-------------------------------------------------------|------------------------------------

@@ -72,7 +72,7 @@ const MetricsPage = () => {
         </div>;
     } else {
         prometheusLink = <div>
-            <Icon prefix="fe" name="external-link" />{" "}<a href="https://github.com/iot-for-all/starling/docs/metrics.md#prometheus" target="_blank" rel="noreferrer">Help me configure</a>
+            <Icon prefix="fe" name="help-circle" />{" "}<a href="https://github.com/iot-for-all/starling/blob/main/docs/metrics.md#prometheus" target="_blank" rel="noreferrer">Help me configure</a>
         </div>;
     }
 
@@ -86,7 +86,7 @@ const MetricsPage = () => {
         </div>;
     } else {
         grafanaLink = <div>
-            <Icon prefix="fe" name="external-link" />{" "}<a href="https://github.com/iot-for-all/starling/docs/metrics.md#grafana" target="_blank" rel="noreferrer">Help me configure</a>
+            <Icon prefix="fe" name="help-circle" />{" "}<a href="https://github.com/iot-for-all/starling/blob/main/docs/metrics.md#grafana" target="_blank" rel="noreferrer">Help me configure</a>
         </div>;
     }
 
@@ -114,7 +114,7 @@ const MetricsPage = () => {
                     </Card.Header>
                     <Card.Body>
                         <div className="simLearnMore">
-                            <Text className="text-default"><Icon prefix="fe" name="help-circle" />{" "} <a href="https://github.com/iot-for-all/starling" target="_blank" rel="noreferrer">Help me configure metrics pipeline</a></Text>
+                            <Text className="text-default"><Icon prefix="fe" name="help-circle" />{" "} <a href="https://github.com/iot-for-all/starling/blob/main/docs/metrics.md" target="_blank" rel="noreferrer">Help me configure metrics pipeline</a></Text>
                         </div>
                         <p>
                         </p>

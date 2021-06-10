@@ -38,7 +38,7 @@ Starling has the following limitations:
    
 ### 4. How can I look at the device side errors? ###
 Starling prints all logs to the console window and writes them to the log file `logs/starling.log`.
-You can change the *Log Level* in the *Settings* tab and restart the Starling server. 
+You can change the *Log Level* in the *Settings* tab and restart the Starling server for applying changes. 
 
 ### 5. Can I simulate devices in my PaaS solution? ###
 Starling is optimized for IoT Central. However, you can use it to simulate devices connecting to your own Azure IoT Hub.
@@ -51,7 +51,7 @@ Parameter                 | Value                                 | Description
 Name                      | My app                                | Some name for your application
 Application URL           | myapp                                 | Some dummy url, does not have to be a valid url
 Device Provisioning URL   | global.azure-devices-provisioning.net | For all DPSs in public could, use this endpoint
-ID Scope                  | `<YOUR_ID_SCOPE>`                     | Enter your ID Scope for your DPS resource
+ID Scope                  | `<YOUR_DPS_ID_SCOPE>`                 | Enter your ID Scope from your DPS
 Device Connection SAS Key | `<YOUR_DPS_SAS_KEY>`                  | DPS Shared access key with enrollment and registration read/write access
 Automatically import all device models for this application | Unchecked | Since this is not a Central application, there is no way to import device models automatically
 
@@ -62,6 +62,6 @@ Automatically import all device models for this application | Unchecked | Since 
    IoT Central APIs to delete them. You can however delete them directly from IoT Hub/DPS.
    * Device models cannot be imported.
 
-[Back to contents](../Readme.md)| Previous: [Setting up metrics collection and dashboards](metrics.md)
+[Back to contents](../README.md)| Previous: [Setting up metrics collection and dashboards](metrics.md)
 ---------------------------------|----------------------------
 

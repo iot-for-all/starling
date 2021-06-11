@@ -5,6 +5,7 @@ different rates. Several simulations can be executed simultaneously.
 
 You can follow along the startup wizard to complete these following steps:
 ![picture alt](assets/ux-start.png "Startup wizard")
+
 <img src="assets/ux-start.png" alt="Startup wizard" style="height: 100px" />
 
 1. **Add an IoT Central application:**  Add the application details such as the URL, Device Provisioning Service (DPS) ID Scope,

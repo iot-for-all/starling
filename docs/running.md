@@ -11,7 +11,8 @@ Raspberry Pi  | `bin/starling_linux_arm64`
 
 ### Running Simulation Server ###
 To start the starling simulation server, run the above executable.
-![picture alt](assets/start.png "Starting Starling")
+
+<img src="assets/start.png" alt="Starting Starling" height=150 />
 
 ### Create Central application ###
 Starling simulates devices that connect to an IoT Central application.

@@ -5,7 +5,7 @@ different rates. Several simulations can be executed simultaneously.
 
 You can follow along the startup wizard to complete these following steps:
 
-<img src="assets/ux-start.png" alt="Startup wizard" height=100 />
+<img src="assets/ux-start.png" alt="Startup wizard" height=150 />
 
 1. **Add an IoT Central application:**  Add the application details such as the URL, Device Provisioning Service (DPS) ID Scope,
    Device connection SAS Key. Make sure you check the *Automatically import all device models for this application* to

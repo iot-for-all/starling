@@ -80,7 +80,7 @@ const AppPage = () => {
                             className="btn btn-sm btn-primary"
                         >
                             <Icon prefix="fe" name="plus" />
-                            Add New
+                            Add Application
                         </Link>
                     </span>
                 </Toolbar>

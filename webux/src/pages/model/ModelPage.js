@@ -102,7 +102,7 @@ const ModelPage = () => {
                             className="btn btn-sm btn-primary"
                         >
                             <Icon prefix="fe" name="plus" />
-                            Add New
+                            Add Device Model
                         </Link>
                     </span>
                 </Toolbar>

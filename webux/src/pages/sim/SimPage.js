@@ -116,7 +116,7 @@ const SimPage = () => {
                             className="btn btn-sm btn-primary"
                         >
                             <Icon prefix="fe" name="plus" />
-                            Add New
+                            Add Simulation
                         </Link>
                     </span>
                 </Toolbar>

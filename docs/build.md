@@ -16,6 +16,7 @@ darwin                         Build for Darwin (macOS)
 clean                          Remove previous build
 help                           Display available commands
 ```
+
 #### Build binaries ####
 Use the `make` command to build binaries for all platforms.
 use the following commands for building only targeting specific platform:

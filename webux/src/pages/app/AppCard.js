@@ -131,7 +131,7 @@ const AppCard = (props) => {
         }
     };
 
-    const title = props.mode ? (props.mode === "add") ? "Add new application" : "Edit application - " + props.data.name : "";
+    const title = props.mode ? (props.mode === "add") ? "Add an existing application" : "Edit application - " + props.data.name : "";
     //console.log("ModelForm - mode: ", props.mode, " backendError: ", props.backendError, " data: ", props.data);
 
     return <>
@@ -173,8 +173,9 @@ const AppCard = (props) => {
                         {backendError}
                     </div>}
                     <p>
-                        Simulated devices are created in an IoT Central application. Create an IoT Central and
-                        enter these details so that the devices can be provisioned using the credentials given below.
+                        Simulated devices are created in an IoT Central application. Enter details for an  existing 
+                        {" "} <a href="https://apps.azureiotcentral.com" target="_blank" rel="noreferrer">IoT Central application</a>.
+                        Simulated devices are provisioned in this application using these credentials.
                         Multiple simulations can be created against an application and executed simultaneously.
                     </p>
                     <Form.Group

@@ -10,16 +10,18 @@ You can follow along the startup wizard to complete these following steps:
 1. **Add an IoT Central application:**  Add the application details such as the URL, Device Provisioning Service (DPS) ID Scope,
    Device connection SAS Key. Make sure you check the *Automatically import all device models for this application* to
    import all device models after adding the application to Starling.
+   
 <img src="assets/ux-addapp.png" alt="Add Application" height=150 />
-
 
 2. **Add Device Models:** Device models are automatically imported from the previous step. Capability model is any 
    [DTDL](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/dtdlv2.md) compatible device model.
    You can get the capability model for your device template from
    IoT Central application >  Device Templates > Select your model > *Export*.
+   
 <img src="assets/ux-addmodel.png" alt="Add Device Model" height=150 />
    
 3. **Add Simulation:** Add a new simulation. See the section below on how to configure a simulation.
+   
    <img src="assets/ux-addsim.png" alt="Add Simulation" height=150 />
 
 4. **Start Simulation:** Once the simulation is added, you can simply start it. It will automatically provision devices
@@ -27,6 +29,7 @@ You can follow along the startup wizard to complete these following steps:
    additional devices are added. Devices are not deleted when simulated device count is reduced.
    You need to go to the Simulation > Provision screen and reduce the provision device count to delete them. Devices
    are deleted when the simulation is deleted.
+   
    <img src="assets/ux-simrunning.png" alt="Simulation Running" height=150 />
 
 

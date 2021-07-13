@@ -52,7 +52,7 @@ Name                      | My app                                | Some name fo
 Application URL           | myapp                                 | Some dummy url, does not have to be a valid url
 Device Provisioning URL   | global.azure-devices-provisioning.net | For all DPSs in public could, use this endpoint
 ID Scope                  | `<YOUR_DPS_ID_SCOPE>`                 | Enter your ID Scope from your DPS
-Device Connection SAS Key | `<YOUR_DPS_SAS_KEY>`                  | DPS Shared access key with enrollment and registration read/write access
+Device Connection SAS Key | `<YOUR_DPS_ENROLLMENT_SAS_KEY>`       | Create a new DPS enrollment. Enter the enrollment Symmetric Key (primary key) with enrollment and registration read/write access
 Automatically import all device models for this application | Unchecked | Since this is not a Central application, there is no way to import device models automatically
 
 3. Add device models in the *models* tab. You can use [brewer.json](./brewer.json) and [drone.json](./drone.json) sample models.

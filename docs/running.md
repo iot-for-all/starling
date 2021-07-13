@@ -4,10 +4,12 @@ Starling simulator has a single executable. This contains the backend server as 
 
 Platform      | Executable
 --------------|----------------------------------
-Windows       | `bin/starling_windows_amd64.exe`
-macOS         | `bin/starling_darwin_amd64`
-Linux         | `bin/starling_linux_amd64`
-Raspberry Pi  | `bin/starling_linux_arm64`
+Windows       | `starling_windows_amd64.exe`
+macOS         | `starling_darwin_amd64`
+Linux         | `starling_linux_amd64`
+Raspberry Pi  | `starling_linux_arm64`
+
+If you build binaries from source, they will be in the `bin` folder.
 
 ### Running Simulation Server ###
 To start the starling simulation server, run the above executable.
